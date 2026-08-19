@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Shivam Gupta | AI &amp; Automation Engineer</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;600;700&amp;family=JetBrains+Mono:wght@500;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-tertiary-fixed-variant": "#005047",
+                        "surface-dim": "#0f1418",
+                        "inverse-surface": "#dfe3e9",
+                        "tertiary": "#45e3ce",
+                        "error-container": "#93000a",
+                        "primary-container": "#38bdf8",
+                        "on-secondary-fixed-variant": "#6900b3",
+                        "inverse-primary": "#00668a",
+                        "inverse-on-surface": "#2c3135",
+                        "secondary": "#ddb7ff",
+                        "tertiary-fixed": "#62fae3",
+                        "surface": "#0f1418",
+                        "on-surface-variant": "#bdc8d1",
+                        "on-primary": "#00354a",
+                        "on-secondary-fixed": "#2c0051",
+                        "on-tertiary-fixed": "#00201c",
+                        "on-primary-container": "#004965",
+                        "outline": "#87929a",
+                        "surface-container": "#1b2024",
+                        "surface-container-lowest": "#0a0f13",
+                        "surface-tint": "#7bd0ff",
+                        "on-secondary": "#490080",
+                        "on-tertiary-container": "#004d44",
+                        "on-surface": "#dfe3e9",
+                        "surface-container-low": "#171c20",
+                        "surface-container-high": "#262b2f",
+                        "primary-fixed": "#c4e7ff",
+                        "primary": "#8ed5ff",
+                        "on-background": "#dfe3e9",
+                        "secondary-fixed-dim": "#ddb7ff",
+                        "secondary-fixed": "#f0dbff",
+                        "on-tertiary": "#003731",
+                        "on-error-container": "#ffdad6",
+                        "tertiary-fixed-dim": "#3cddc7",
+                        "background": "#0f1418",
+                        "surface-bright": "#353a3e",
+                        "outline-variant": "#3e484f",
+                        "on-error": "#690005",
+                        "on-secondary-container": "#d6a9ff",
+                        "tertiary-container": "#07c7b2",
+                        "surface-variant": "#30353a",
+                        "surface-container-highest": "#30353a",
+                        "on-primary-fixed": "#001e2c",
+                        "secondary-container": "#6f00be",
+                        "error": "#ffb4ab",
+                        "on-primary-fixed-variant": "#004c69",
+                        "primary-fixed-dim": "#7bd0ff"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "gutter": "1.5rem",
+                        "unit": "4px",
+                        "element-gap": "0.75rem",
+                        "container-padding-mobile": "1rem",
+                        "container-padding-desktop": "2.5rem"
+                    },
+                    "fontFamily": {
+                        "display-md": ["Geist", "sans-serif"],
+                        "body-md": ["Geist", "sans-serif"],
+                        "label-caps": ["JetBrains Mono", "monospace"],
+                        "headline-sm": ["Geist", "sans-serif"],
+                        "display-lg": ["Geist", "sans-serif"],
+                        "display-lg-mobile": ["Geist", "sans-serif"],
+                        "data-mono": ["JetBrains Mono", "monospace"]
+                    },
+                    "fontSize": {
+                        "display-md": ["32px", { "lineHeight": "1.2", "letterSpacing": "-0.03em", "fontWeight": "600" }],
+                        "body-md": ["16px", { "lineHeight": "1.6", "letterSpacing": "0em", "fontWeight": "400" }],
+                        "label-caps": ["12px", { "lineHeight": "1.2", "letterSpacing": "0.1em", "fontWeight": "700" }],
+                        "headline-sm": ["24px", { "lineHeight": "1.3", "letterSpacing": "-0.02em", "fontWeight": "600" }],
+                        "display-lg": ["48px", { "lineHeight": "1.1", "letterSpacing": "-0.04em", "fontWeight": "700" }],
+                        "display-lg-mobile": ["32px", { "lineHeight": "1.1", "letterSpacing": "-0.03em", "fontWeight": "700" }],
+                        "data-mono": ["14px", { "lineHeight": "1.5", "letterSpacing": "0.02em", "fontWeight": "500" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        .aurora-bg {
+            background: radial-gradient(circle at 10% 20%, rgba(56, 189, 248, 0.15) 0%, transparent 40%),
+                        radial-gradient(circle at 90% 80%, rgba(221, 183, 255, 0.15) 0%, transparent 40%),
+                        radial-gradient(circle at 50% 50%, rgba(69, 227, 206, 0.1) 0%, transparent 50%);
+            background-color: #0a0f13; /* surface-container-lowest */
+        }
+        .glass-panel {
+            background: rgba(27, 32, 36, 0.65); /* surface-container */
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            border: 1px solid rgba(135, 146, 154, 0.2); /* outline */
+        }
+        .glass-panel-hover:hover {
+            background: rgba(48, 53, 58, 0.8); /* surface-variant */
+            border-color: rgba(142, 213, 255, 0.5); /* primary */
+            box-shadow: 0 0 15px rgba(142, 213, 255, 0.3);
+        }
+        .glow-text {
+            text-shadow: 0 0 15px rgba(142, 213, 255, 0.4);
+        }
+        .border-glow {
+            box-shadow: 0 0 15px rgba(142, 213, 255, 0.3);
+        }
+        .scanline {
+            background: linear-gradient(to bottom, transparent 50%, rgba(0, 0, 0, 0.25) 51%);
+            background-size: 100% 4px;
+        }
+    </style>
+</head>
+<body class="bg-surface-container-lowest text-on-surface font-body-md min-h-screen selection:bg-primary selection:text-on-primary aurora-bg relative overflow-x-hidden">
+<!-- TopNavBar JSON Injection -->
+<nav class="bg-surface-container/65 backdrop-blur-xl rounded-full max-w-fit mx-auto mt-6 sticky top-6 border border-outline-variant/30 shadow-[0_0_20px_rgba(0,0,0,0.5)] z-50">
+<div class="flex items-center justify-between px-6 py-3 gap-8">
+<div class="font-display-md text-display-md font-bold text-primary bg-surface-container-high p-2 rounded-lg border border-primary/20 shadow-[0_0_15px_rgba(123,208,255,0.3)]">
+                SG
+            </div>
+<div class="hidden md:flex items-center gap-6">
+<a class="text-primary font-bold border-b border-primary/50 font-label-caps text-label-caps hover:text-primary transition-colors duration-300 scale-95 active:scale-90 transition-transform" href="#">Projects</a>
+<a class="text-on-surface-variant font-label-caps text-label-caps hover:text-primary transition-colors duration-300 scale-95 active:scale-90 transition-transform" href="#">Automation</a>
+<a class="text-on-surface-variant font-label-caps text-label-caps hover:text-primary transition-colors duration-300 scale-95 active:scale-90 transition-transform" href="#">Stack</a>
+<a class="text-on-surface-variant font-label-caps text-label-caps hover:text-primary transition-colors duration-300 scale-95 active:scale-90 transition-transform" href="#">About</a>
+</div>
+<div class="flex items-center gap-4">
+<button class="bg-gradient-to-r from-primary to-secondary text-on-primary font-label-caps text-label-caps px-4 py-2 rounded-lg border-glow hover:brightness-110 transition-all scale-95 active:scale-90 transition-transform">
+                    Hire Me
+                </button>
+<button class="text-primary hover:text-secondary transition-colors scale-95 active:scale-90 transition-transform">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">mail</span>
+</button>
+</div>
+</div>
+</nav>
+<!-- 1. Hero Section -->
+<section class="min-h-[90vh] flex items-center relative px-container-padding-mobile md:px-container-padding-desktop mt-12 md:mt-0">
+<div class="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-12 items-center w-full">
+<div class="flex flex-col gap-6 z-10">
+<div class="glass-panel px-4 py-2 rounded-full inline-flex w-fit items-center gap-2 border-primary/30">
+<span class="w-2 h-2 rounded-full bg-primary animate-pulse shadow-[0_0_10px_rgba(142,213,255,0.8)]"></span>
+<span class="font-label-caps text-label-caps text-primary tracking-wider">AI AND AUTOMATION ENGINEER</span>
+</div>
+<h1 class="font-display-lg-mobile md:font-display-lg text-on-surface tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-white to-on-surface-variant glow-text">
+                    I automate the operations I used to run by hand.
+                </h1>
+<p class="font-body-md text-on-surface-variant max-w-lg text-lg">
+                    Architecting 10+ robust systems that replace manual toil with precise, scalable logic. Building the invisible infrastructure for modern data flows.
+                </p>
+<div class="flex flex-wrap gap-4 mt-4">
+<button class="bg-gradient-to-r from-primary to-secondary text-on-primary font-label-caps text-label-caps px-6 py-3 rounded-lg border-glow hover:brightness-110 transition-all shadow-[0_0_20px_rgba(142,213,255,0.4)]">
+                        View work
+                    </button>
+<button class="glass-panel text-on-surface font-label-caps text-label-caps px-6 py-3 rounded-lg hover:border-primary/50 hover:text-primary transition-all">
+                        Download resume
+                    </button>
+</div>
+</div>
+<div class="relative z-10 w-full h-[400px] md:h-[500px]">
+<div class="absolute inset-0 bg-primary/5 blur-[100px] rounded-full"></div>
+<img alt="Node graph visualization" class="w-full h-full object-contain drop-shadow-[0_0_30px_rgba(142,213,255,0.2)]" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBznlAjMvdIWGYgRYm6xKlM-BCWyHoxEdpigUPN-G9gyMklLr99C39ImqkuRMGLs4Wit8dDBTiRPfGl5OYNPTCFvtd6mJlIvSHbAh10P1IEnc-t5Fu1LZR1lMSGyqHYRsCjdvDI1jiCQSrzF3_gzOl89F4w0rjaPManxZdt3VZmD1LJYaiiYpI2eeEfy0k-dLW_6gH4wMUUV1BYk2zeLhZnRhCpnpcmZSF1nvccw61rEiVh8ZJ8s6GDJIr0KEpEwo_4FwVPrynnx-wz"/>
+</div>
+</div>
+</section>
+<!-- 2. Live Execution Feed -->
+<section class="px-container-padding-mobile md:px-container-padding-desktop py-12 relative z-10">
+<div class="max-w-7xl mx-auto">
+<div class="glass-panel rounded-xl overflow-hidden border-t-primary/30 relative">
+<div class="absolute inset-0 scanline opacity-30 pointer-events-none"></div>
+<div class="bg-surface-container-high/80 px-6 py-3 border-b border-outline-variant/30 flex items-center justify-between">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-primary text-sm">terminal</span>
+<span class="font-label-caps text-label-caps text-on-surface-variant">Live Execution Log</span>
+</div>
+<div class="flex gap-2">
+<div class="w-2.5 h-2.5 rounded-full bg-outline-variant"></div>
+<div class="w-2.5 h-2.5 rounded-full bg-outline-variant"></div>
+<div class="w-2.5 h-2.5 rounded-full bg-primary/50"></div>
+</div>
+</div>
+<div class="p-6 font-data-mono text-data-mono text-on-surface-variant space-y-3 h-48 overflow-y-auto">
+<div class="flex items-start gap-4">
+<span class="text-outline">08:00:12</span>
+<span class="w-2 h-2 rounded-full bg-tertiary mt-1.5 shadow-[0_0_8px_rgba(69,227,206,0.6)]"></span>
+<span class="text-on-surface">LMS Onboarding - 47 students provisioned successfully via API hook.</span>
+</div>
+<div class="flex items-start gap-4">
+<span class="text-outline">14:22:45</span>
+<span class="w-2 h-2 rounded-full bg-tertiary mt-1.5 shadow-[0_0_8px_rgba(69,227,206,0.6)]"></span>
+<span class="text-on-surface">Daily Reporting Cron - Generated 15 executive summaries.</span>
+</div>
+<div class="flex items-start gap-4">
+<span class="text-outline">20:00:03</span>
+<span class="w-2 h-2 rounded-full bg-error mt-1.5 shadow-[0_0_8px_rgba(255,180,171,0.6)]"></span>
+<span class="text-error">MCube Defaulter Alert - 12 agents flagged for review. Escalating.</span>
+</div>
+<div class="flex items-start gap-4 animate-pulse">
+<span class="text-outline">23:59:59</span>
+<span class="text-primary">&gt;_</span>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- 3. Metrics -->
+<section class="px-container-padding-mobile md:px-container-padding-desktop py-12 relative z-10">
+<div class="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-6">
+<div class="glass-panel glass-panel-hover p-8 rounded-xl relative overflow-hidden group transition-all">
+<div class="absolute inset-0 bg-gradient-to-tr from-primary/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+<div class="relative z-10">
+<div class="font-display-lg-mobile md:font-display-lg text-transparent bg-clip-text bg-gradient-to-r from-primary to-secondary glow-text">10</div>
+<div class="font-data-mono text-data-mono text-on-surface-variant mt-2">Core Automations Deployed</div>
+</div>
+<!-- Abstract sparkline -->
+<svg class="absolute bottom-0 right-0 w-full h-1/2 opacity-20 text-primary" preserveaspectratio="none" viewbox="0 0 100 50">
+<path d="M0,50 L20,30 L40,40 L60,10 L80,20 L100,5" fill="none" stroke="currentColor" stroke-width="2"></path>
+</svg>
+</div>
+<div class="glass-panel glass-panel-hover p-8 rounded-xl relative overflow-hidden group transition-all">
+<div class="absolute inset-0 bg-gradient-to-tr from-tertiary/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+<div class="relative z-10">
+<div class="font-display-lg-mobile md:font-display-lg text-transparent bg-clip-text bg-gradient-to-r from-tertiary to-tertiary-fixed-dim glow-text">1,200+</div>
+<div class="font-data-mono text-data-mono text-on-surface-variant mt-2">Hours Saved Monthly</div>
+</div>
+<svg class="absolute bottom-0 right-0 w-full h-1/2 opacity-20 text-tertiary" preserveaspectratio="none" viewbox="0 0 100 50">
+<path d="M0,50 L30,40 L50,15 L70,25 L100,0" fill="none" stroke="currentColor" stroke-width="2"></path>
+</svg>
+</div>
+<div class="glass-panel glass-panel-hover p-8 rounded-xl relative overflow-hidden group transition-all">
+<div class="absolute inset-0 bg-gradient-to-tr from-secondary/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+<div class="relative z-10">
+<div class="font-display-lg-mobile md:font-display-lg text-transparent bg-clip-text bg-gradient-to-r from-secondary to-secondary-container glow-text">13</div>
+<div class="font-data-mono text-data-mono text-on-surface-variant mt-2">Systems Integrated</div>
+</div>
+<svg class="absolute bottom-0 right-0 w-full h-1/2 opacity-20 text-secondary" preserveaspectratio="none" viewbox="0 0 100 50">
+<path d="M0,40 L20,45 L40,20 L60,35 L80,10 L100,20" fill="none" stroke="currentColor" stroke-width="2"></path>
+</svg>
+</div>
+</div>
+</section>
+<!-- 4. Selected Work (Bento Grid) -->
+<section class="px-container-padding-mobile md:px-container-padding-desktop py-16 relative z-10">
+<div class="max-w-7xl mx-auto">
+<h2 class="font-headline-sm text-on-surface mb-8 border-b border-outline-variant/30 pb-4 flex items-center gap-3">
+<span class="material-symbols-outlined text-primary">grid_view</span>
+                Selected Architecture
+            </h2>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6 auto-rows-[300px]">
+<!-- Main Card -->
+<div class="md:col-span-2 md:row-span-2 glass-panel glass-panel-hover rounded-[20px] p-8 flex flex-col justify-between relative overflow-hidden group">
+<div class="absolute top-0 right-0 w-64 h-64 bg-primary/10 rounded-full blur-[80px] -mr-10 -mt-10 group-hover:bg-primary/20 transition-all"></div>
+<div class="relative z-10">
+<div class="inline-block px-3 py-1 bg-surface-container-high rounded-full border border-outline-variant/50 font-label-caps text-label-caps text-primary mb-4">Core System</div>
+<h3 class="font-headline-sm text-on-surface mb-2">SkillCircle Job Portal</h3>
+<p class="text-on-surface-variant max-w-md">End-to-end automated placement pipeline connecting students, HR, and LMS data securely.</p>
+</div>
+<div class="mt-8 relative h-48 bg-surface-container-lowest/50 rounded-lg border border-outline-variant/30 overflow-hidden">
+<div class="absolute inset-0 bg-[url('placeholder')] bg-cover bg-center opacity-50 mix-blend-luminosity" data-alt="A highly detailed UI mockup of a dark-mode web application dashboard. The dashboard features complex data tables, glowing cyan charts, and modern frosted glass panels. The aesthetic is futuristic and technical, set against a deep navy background."></div>
+<div class="absolute inset-0 flex items-center justify-center backdrop-blur-sm">
+<button class="w-12 h-12 rounded-full bg-primary/20 border border-primary text-primary flex items-center justify-center hover:bg-primary hover:text-on-primary transition-colors shadow-[0_0_15px_rgba(142,213,255,0.4)]">
+<span class="material-symbols-outlined">arrow_forward</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Secondary Card 1 -->
+<div class="glass-panel glass-panel-hover rounded-[20px] p-6 flex flex-col justify-between relative group overflow-hidden">
+<div class="absolute inset-0 bg-gradient-to-br from-tertiary/5 to-transparent"></div>
+<div>
+<div class="inline-block px-3 py-1 bg-surface-container-high rounded-full border border-outline-variant/50 font-label-caps text-label-caps text-tertiary mb-4">AI Agent</div>
+<h3 class="font-headline-sm text-on-surface mb-2 text-lg">RAG Support Bot</h3>
+<p class="text-on-surface-variant text-sm">Context-aware conversational agent trained on internal documentation.</p>
+</div>
+<div class="flex gap-2 mt-4">
+<span class="px-2 py-1 rounded bg-surface-variant text-xs font-data-mono text-outline">Python</span>
+<span class="px-2 py-1 rounded bg-surface-variant text-xs font-data-mono text-outline">LangChain</span>
+</div>
+</div>
+<!-- Secondary Card 2 -->
+<div class="glass-panel glass-panel-hover rounded-[20px] p-6 flex flex-col justify-between relative group overflow-hidden">
+<div class="absolute inset-0 bg-gradient-to-br from-secondary/5 to-transparent"></div>
+<div>
+<div class="inline-block px-3 py-1 bg-surface-container-high rounded-full border border-outline-variant/50 font-label-caps text-label-caps text-secondary mb-4">Data Pipeline</div>
+<h3 class="font-headline-sm text-on-surface mb-2 text-lg">Admission Dashboard</h3>
+<p class="text-on-surface-variant text-sm">Real-time sync between CRM leads and conversion metrics.</p>
+</div>
+<div class="flex gap-2 mt-4">
+<span class="px-2 py-1 rounded bg-surface-variant text-xs font-data-mono text-outline">Make.com</span>
+<span class="px-2 py-1 rounded bg-surface-variant text-xs font-data-mono text-outline">API</span>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- 5. Automation Catalogue (Data Table) -->
+<section class="px-container-padding-mobile md:px-container-padding-desktop py-16 relative z-10 pb-32">
+<div class="max-w-7xl mx-auto">
+<div class="glass-panel rounded-xl overflow-hidden">
+<div class="bg-surface-container-high/50 px-6 py-4 border-b border-outline-variant/30">
+<h2 class="font-headline-sm text-on-surface text-lg">Automation Catalogue</h2>
+</div>
+<div class="overflow-x-auto">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="bg-surface-container-lowest/30 border-b border-outline-variant/20 font-label-caps text-label-caps text-on-surface-variant">
+<th class="p-4 font-normal">Workflow</th>
+<th class="p-4 font-normal">Trigger</th>
+<th class="p-4 font-normal">Systems</th>
+<th class="p-4 font-normal">Status</th>
+</tr>
+</thead>
+<tbody class="font-data-mono text-data-mono text-on-surface">
+<tr class="border-b border-outline-variant/10 hover:bg-surface-variant/30 transition-colors group">
+<td class="p-4 relative">
+<div class="absolute left-0 top-0 bottom-0 w-1 bg-primary opacity-0 group-hover:opacity-100 transition-opacity shadow-[0_0_10px_rgba(142,213,255,0.8)]"></div>
+                                    Student Provisioning
+                                </td>
+<td class="p-4 text-outline">Payment Webhook</td>
+<td class="p-4 flex gap-2">
+<span class="px-2 py-1 bg-surface-container rounded-md text-xs border border-outline-variant/30">Stripe</span>
+<span class="px-2 py-1 bg-surface-container rounded-md text-xs border border-outline-variant/30">LMS API</span>
+</td>
+<td class="p-4">
+<span class="inline-flex items-center gap-1.5 px-2 py-1 rounded-full bg-primary/10 border border-primary/30 text-primary text-xs shadow-[0_0_10px_rgba(142,213,255,0.2)]">
+<span class="w-1.5 h-1.5 rounded-full bg-primary animate-pulse"></span>
+                                        LIVE
+                                    </span>
+</td>
+</tr>
+<tr class="border-b border-outline-variant/10 hover:bg-surface-variant/30 transition-colors group">
+<td class="p-4 relative">
+<div class="absolute left-0 top-0 bottom-0 w-1 bg-primary opacity-0 group-hover:opacity-100 transition-opacity shadow-[0_0_10px_rgba(142,213,255,0.8)]"></div>
+                                    Lead Routing
+                                </td>
+<td class="p-4 text-outline">Form Submit</td>
+<td class="p-4 flex gap-2">
+<span class="px-2 py-1 bg-surface-container rounded-md text-xs border border-outline-variant/30">Typeform</span>
+<span class="px-2 py-1 bg-surface-container rounded-md text-xs border border-outline-variant/30">HubSpot</span>
+</td>
+<td class="p-4">
+<span class="inline-flex items-center gap-1.5 px-2 py-1 rounded-full bg-primary/10 border border-primary/30 text-primary text-xs shadow-[0_0_10px_rgba(142,213,255,0.2)]">
+<span class="w-1.5 h-1.5 rounded-full bg-primary animate-pulse"></span>
+                                        LIVE
+                                    </span>
+</td>
+</tr>
+<tr class="hover:bg-surface-variant/30 transition-colors group">
+<td class="p-4 relative">
+<div class="absolute left-0 top-0 bottom-0 w-1 bg-secondary opacity-0 group-hover:opacity-100 transition-opacity shadow-[0_0_10px_rgba(221,183,255,0.8)]"></div>
+                                    Support Triage
+                                </td>
+<td class="p-4 text-outline">Email Received</td>
+<td class="p-4 flex gap-2">
+<span class="px-2 py-1 bg-surface-container rounded-md text-xs border border-outline-variant/30">Gmail</span>
+<span class="px-2 py-1 bg-surface-container rounded-md text-xs border border-outline-variant/30">OpenAI</span>
+</td>
+<td class="p-4">
+<span class="inline-flex items-center gap-1.5 px-2 py-1 rounded-full bg-secondary/10 border border-secondary/30 text-secondary text-xs">
+<span class="material-symbols-outlined text-[10px]">build</span>
+                                        BETA
+                                    </span>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+</section>
+<!-- Footer JSON Injection -->
+<footer class="bg-transparent w-full relative overflow-hidden border-t border-outline-variant/20">
+<div class="flex flex-col items-center justify-center pt-20 pb-10 px-gutter bg-gradient-to-t from-primary/10 to-transparent">
+<div class="font-display-lg text-display-lg text-primary drop-shadow-[0_0_25px_rgba(123,208,255,0.4)] mb-8">
+                SG
+            </div>
+<div class="flex gap-6 mb-8">
+<a class="font-data-mono text-data-mono text-on-surface-variant hover:text-secondary transition-all" href="#">GitHub</a>
+<a class="font-data-mono text-data-mono text-on-surface-variant hover:text-secondary transition-all" href="#">LinkedIn</a>
+<a class="font-data-mono text-data-mono text-on-surface-variant hover:text-secondary transition-all" href="#">Email</a>
+<a class="font-data-mono text-data-mono text-on-surface-variant hover:text-secondary transition-all" href="#">Resume</a>
+</div>
+<p class="font-data-mono text-data-mono text-primary text-center opacity-70">
+                © 2024 AI &amp; Automation Engineer. Built with Precision.
+            </p>
+</div>
+</footer>
+</body></html>

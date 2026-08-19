@@ -39,3 +39,10 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# keep the template, ignore real secrets
+!.env.example
+
+# personal reference material — not for a public repo
+Profile.pdf
+design/*.png
