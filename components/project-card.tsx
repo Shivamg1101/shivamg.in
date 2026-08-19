@@ -104,7 +104,7 @@ export function ProjectCard({ project, index }: { project: Project; index: numbe
       <div className="flex flex-1 flex-col p-2 pt-5">
         <div className="mb-3 flex flex-wrap items-center gap-2">
           <span className="rounded-full border border-primary/20 bg-primary/10 px-3 py-1 text-xs font-semibold text-primary">
-            {project.kind === "case-study" ? "Case Study" : "Platform"}
+            {project.category ?? (project.kind === "case-study" ? "Case Study" : "Platform")}
           </span>
           {project.live_url && (
             <span className="rounded-full border border-border/50 bg-muted/50 px-3 py-1 text-xs font-semibold text-muted-foreground">
