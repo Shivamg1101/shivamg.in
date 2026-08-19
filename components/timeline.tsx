@@ -11,6 +11,38 @@ const NODE_GRADIENTS = [
   "from-yellow-500 to-orange-500",
 ];
 
+const NODE_ICONS = [
+  // cpu
+  <svg key="cpu" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+    <rect x="4" y="4" width="16" height="16" rx="2" />
+    <rect x="9" y="9" width="6" height="6" />
+    <path d="M9 1v3M15 1v3M9 20v3M15 20v3M20 9h3M20 14h3M1 9h3M1 14h3" />
+  </svg>,
+  // server
+  <svg key="server" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+    <rect x="2" y="2" width="20" height="8" rx="2" />
+    <rect x="2" y="14" width="20" height="8" rx="2" />
+    <path d="M6 6h.01M6 18h.01" />
+  </svg>,
+  // code
+  <svg key="code" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+    <polyline points="16 18 22 12 16 6" />
+    <polyline points="8 6 2 12 8 18" />
+  </svg>,
+  // cloud
+  <svg key="cloud" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+    <path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z" />
+  </svg>,
+];
+
+/** "2026 – Now" / "2025 – 2026" / "2024" */
+function yearLabel(start: string, end: string | null, isCurrent: boolean) {
+  const a = new Date(start).getFullYear();
+  if (isCurrent || !end) return `${a} – Now`;
+  const b = new Date(end).getFullYear();
+  return a === b ? String(a) : `${a} – ${b}`;
+}
+
 function MapPin() {
   return (
     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
@@ -173,15 +205,20 @@ export function Timeline({ items }: { items: Experience[] }) {
               </article>
             </TimelineCard>
 
-            {/* node on the centre line */}
-            <div
-              className={`relative z-2 hidden h-16 w-16 flex-none rounded-full bg-gradient-to-br p-1 shadow-xl ring-2 ring-primary/30 lg:block ${
-                NODE_GRADIENTS[i % NODE_GRADIENTS.length]
-              }`}
-            >
-              <div className="grid h-full w-full place-items-center rounded-full bg-card text-[13px] font-extrabold">
-                {new Date(x.start_date).getFullYear().toString().slice(2)}
+            {/* node on the centre line: icon badge with a year pill beneath */}
+            <div className="relative z-2 hidden flex-none flex-col items-center lg:flex">
+              <div
+                className={`h-16 w-16 rounded-full bg-gradient-to-br p-1 shadow-xl ring-2 ring-primary/30 ${
+                  NODE_GRADIENTS[i % NODE_GRADIENTS.length]
+                }`}
+              >
+                <div className="grid h-full w-full place-items-center rounded-full bg-card text-primary">
+                  {NODE_ICONS[i % NODE_ICONS.length]}
+                </div>
               </div>
+              <span className="mt-3 whitespace-nowrap rounded-full border border-primary/30 bg-primary/10 px-3 py-1 text-[11px] font-semibold tabular-nums text-primary">
+                {yearLabel(x.start_date, x.end_date, x.is_current)}
+              </span>
             </div>
 
             <div className="hidden flex-1 lg:block" />
