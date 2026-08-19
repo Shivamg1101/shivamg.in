@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { BreadcrumbSchema, ExperienceSchema } from "@/components/structured-data";
 import { Reveal } from "@/components/motion";
 import { Timeline } from "@/components/timeline";
 import { getAutomations, getExperience } from "@/lib/queries";
@@ -6,6 +7,7 @@ import { getAutomations, getExperience } from "@/lib/queries";
 export const revalidate = 60;
 
 export const metadata: Metadata = {
+  alternates: { canonical: "/experience" },
   title: "Experience | Shivam Gupta",
   description:
     "Automation, AI and infrastructure roles — what each one shipped, and the metrics behind them.",
@@ -31,6 +33,8 @@ export default async function ExperiencePage() {
 
   return (
     <>
+      <BreadcrumbSchema trail={[{ name: "Experience", path: "/experience" }]} />
+      <ExperienceSchema items={experience} />
       {/* ---------------- hero ---------------- */}
       <section className="relative overflow-hidden bg-background pb-10 pt-16 dark:bg-black">
         <div aria-hidden className="absolute -left-40 -top-40 h-80 w-80 rounded-full bg-primary/5 blur-3xl" />

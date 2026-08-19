@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { BreadcrumbSchema } from "@/components/structured-data";
 import { Reveal } from "@/components/motion";
 import { ProfileTabs, SkillMatrix, type SkillGroup, type Tab } from "@/components/about-widgets";
 import { getAutomations, getProfile, getProjects } from "@/lib/queries";
@@ -7,6 +8,7 @@ import { getAutomations, getProfile, getProjects } from "@/lib/queries";
 export const revalidate = 60;
 
 export const metadata: Metadata = {
+  alternates: { canonical: "/about" },
   title: "About | Shivam Gupta",
   description:
     "How I moved from running hosting infrastructure for 1,200+ domains to owning AI and automation — the approach, the stack, and what I optimise for.",
@@ -195,6 +197,7 @@ export default async function AboutPage() {
 
   return (
     <>
+      <BreadcrumbSchema trail={[{ name: "About", path: "/about" }]} />
       {/* ---------------- hero ---------------- */}
       <section className="relative overflow-hidden bg-background pb-14 pt-16 dark:bg-black">
         <div aria-hidden className="absolute -left-40 -top-40 h-80 w-80 rounded-full bg-primary/5 blur-3xl" />

@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { ContactForm } from "@/components/contact-form";
+import { BreadcrumbSchema } from "@/components/structured-data";
 import { Reveal } from "@/components/motion";
 import { PageHeader } from "@/components/sections";
 import { getProfile } from "@/lib/queries";
@@ -7,6 +8,7 @@ import { getProfile } from "@/lib/queries";
 export const revalidate = 60;
 
 export const metadata: Metadata = {
+  alternates: { canonical: "/contact" },
   title: "Contact | Shivam Gupta",
   description: "Open to AI Engineer and AI & Automation Engineer roles.",
 };
@@ -16,6 +18,7 @@ export default async function ContactPage() {
 
   return (
     <>
+      <BreadcrumbSchema trail={[{ name: "Contact", path: "/contact" }]} />
       <PageHeader
         kicker="Contact"
         title="Get in Touch"
