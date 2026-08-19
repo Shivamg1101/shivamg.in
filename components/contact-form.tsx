@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { createClient } from "@/lib/supabase/client";
 
 type State = "idle" | "sending" | "sent" | "error";
 
@@ -17,27 +16,45 @@ export function ContactForm() {
     setState("sending");
     setError(null);
 
-    const { error } = await createClient().from("messages").insert({
-      name: String(data.get("name") ?? "").trim(),
-      email: String(data.get("email") ?? "").trim(),
-      message: String(data.get("message") ?? "").trim(),
-    });
+    try {
+      const res = await fetch("/api/contact", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: data.get("name"),
+          email: data.get("email"),
+          message: data.get("message"),
+          company: data.get("company"), // honeypot
+        }),
+      });
 
-    if (error) {
+      const json = await res.json().catch(() => ({}));
+
+      if (!res.ok) {
+        setState("error");
+        setError(json.error ?? "That didn't send. Try again, or email me directly.");
+        return;
+      }
+
+      form.reset();
+      setState("sent");
+    } catch {
       setState("error");
-      setError("That didn't send. Try again, or email me directly.");
-      return;
+      setError("That didn't send. Check your connection, or email me directly.");
     }
-
-    form.reset();
-    setState("sent");
   }
 
   const field =
     "w-full rounded-md border border-input bg-card px-3 py-2.5 text-sm outline-none transition-colors placeholder:text-muted-foreground focus:border-primary";
 
   return (
-    <form onSubmit={onSubmit} className="mx-auto grid max-w-lg gap-4 text-left">
+    <form onSubmit={onSubmit} className="grid gap-4 text-left">
+      {/* Honeypot: off-screen and hidden from assistive tech. Bots fill it. */}
+      <div aria-hidden className="pointer-events-none absolute -left-[9999px] opacity-0">
+        <label htmlFor="cf-company">Company</label>
+        <input id="cf-company" name="company" type="text" tabIndex={-1} autoComplete="off" />
+      </div>
+
       <div className="grid gap-1.5">
         <label htmlFor="cf-name" className="text-sm font-semibold">
           Name
