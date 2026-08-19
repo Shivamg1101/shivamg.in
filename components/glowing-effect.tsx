@@ -43,7 +43,7 @@ export function GlowingEffect({
 
         const cx = r.left + r.width / 2;
         const cy = r.top + r.height / 2;
-        let target = (Math.atan2(e.clientY - cy, e.clientX - cx) * 180) / Math.PI + 90;
+        const target = (Math.atan2(e.clientY - cy, e.clientX - cx) * 180) / Math.PI + 90;
 
         // take the shortest way round so the sweep never spins the long way
         const delta = ((target - angle.current + 180) % 360) - 180;

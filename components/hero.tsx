@@ -31,9 +31,13 @@ function useTypewriter(words: string[], enabled: boolean) {
       return () => clearTimeout(hold);
     }
     if (deleting && text === "") {
-      setDeleting(false);
-      setIndex((i) => (i + 1) % words.length);
-      return;
+      // brief beat between words; also keeps the transition out of the
+      // effect body, where a synchronous setState would cascade renders
+      const gap = setTimeout(() => {
+        setDeleting(false);
+        setIndex((i) => (i + 1) % words.length);
+      }, 220);
+      return () => clearTimeout(gap);
     }
 
     const next = deleting ? word.slice(0, text.length - 1) : word.slice(0, text.length + 1);
@@ -45,25 +49,26 @@ function useTypewriter(words: string[], enabled: boolean) {
 }
 
 /* ------------------------------------------------------------------ *
- * Drifting particle field. Generated after mount so the random values
- * never differ between server and client render.
+ * Drifting particle field.
  * ------------------------------------------------------------------ */
-function Particles({ count = 50 }: { count?: number }) {
-  const [seeds, setSeeds] = useState<
-    { size: number; x: number; y: number; dur: number; delay: number }[]
-  >([]);
+/** Deterministic hash so the field is identical on server and client. */
+function rand(i: number, salt: number) {
+  const x = Math.sin(i * 12.9898 + salt * 78.233) * 43758.5453;
+  return x - Math.floor(x);
+}
 
-  useEffect(() => {
-    setSeeds(
-      Array.from({ length: count }, () => ({
-        size: 1 + Math.random() * 3,
-        x: Math.random() * 100,
-        y: Math.random() * 100,
-        dur: 12 + Math.random() * 14,
-        delay: Math.random() * 10,
-      }))
-    );
-  }, [count]);
+function Particles({ count = 50 }: { count?: number }) {
+  const seeds = useMemo(
+    () =>
+      Array.from({ length: count }, (_, i) => ({
+        size: 1 + rand(i, 1) * 3,
+        x: rand(i, 2) * 100,
+        y: rand(i, 3) * 100,
+        dur: 12 + rand(i, 4) * 14,
+        delay: rand(i, 5) * 10,
+      })),
+    [count]
+  );
 
   return (
     <div aria-hidden className="absolute inset-0 overflow-hidden">
