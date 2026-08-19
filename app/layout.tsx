@@ -10,7 +10,7 @@ const jakarta = Plus_Jakarta_Sans({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://shivamgupta.dev"),
+  metadataBase: new URL("https://shivamg.in"),
   title: "Shivam Gupta | AI & Automation Engineer",
   description:
     "Portfolio of Shivam Gupta — AI & Automation Engineer building production n8n workflows, retrieval-grounded agents and full-stack platforms on Next.js and Supabase.",
