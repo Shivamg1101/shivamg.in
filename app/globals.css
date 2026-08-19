@@ -85,33 +85,37 @@
 /* ============================================================
    Base
    ============================================================ */
-* {
-  border-color: hsl(var(--border));
-  box-sizing: border-box;
-}
+/* These must live in @layer base. Unlayered, they outrank every utility —
+   a bare `* { border-color }` would beat `border-primary/50` everywhere. */
+@layer base {
+  * {
+    border-color: hsl(var(--border));
+    box-sizing: border-box;
+  }
 
-html {
-  scroll-behavior: smooth;
-}
+  html {
+    scroll-behavior: smooth;
+  }
 
-body {
-  background: hsl(var(--background));
-  color: hsl(var(--foreground));
-  font-family: var(--font-jakarta), ui-sans-serif, system-ui, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  line-height: 1.65;
-}
+  body {
+    background: hsl(var(--background));
+    color: hsl(var(--foreground));
+    font-family: var(--font-jakarta), ui-sans-serif, system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    line-height: 1.65;
+  }
 
-h1, h2, h3, h4 {
-  text-wrap: balance;
-  letter-spacing: -0.025em;
-  line-height: 1.15;
-}
+  h1, h2, h3, h4 {
+    text-wrap: balance;
+    letter-spacing: -0.025em;
+    line-height: 1.15;
+  }
 
-:focus-visible {
-  outline: 2px solid hsl(var(--ring));
-  outline-offset: 2px;
-  border-radius: 4px;
+  :focus-visible {
+    outline: 2px solid hsl(var(--ring));
+    outline-offset: 2px;
+    border-radius: 4px;
+  }
 }
 
 /* ============================================================

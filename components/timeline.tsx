@@ -5,10 +5,10 @@ import { StaggerItem, TimelineCard, TimelineFill, TimelineRow } from "@/componen
 import { formatRange, type Experience } from "@/lib/types";
 
 const NODE_GRADIENTS = [
-  "from-blue-500 to-cyan-500",
-  "from-green-500 to-emerald-500",
   "from-violet-500 to-purple-600",
+  "from-blue-500 to-cyan-500",
   "from-yellow-500 to-orange-500",
+  "from-green-500 to-emerald-500",
 ];
 
 const NODE_ICONS = [
@@ -90,12 +90,12 @@ export function Timeline({ items }: { items: Experience[] }) {
   return (
     <div ref={ref} className="relative py-2">
       {/* centre line + scroll-driven fill */}
-      <div className="absolute inset-y-0 left-1/2 hidden w-[3px] -translate-x-1/2 bg-gradient-to-b from-transparent via-border to-transparent lg:block">
+      <div className="absolute inset-y-0 left-1/2 z-0 hidden w-[3px] -translate-x-1/2 bg-gradient-to-b from-transparent via-border to-transparent lg:block">
         <TimelineFill targetRef={ref} />
       </div>
 
       {/* drifting particles */}
-      <div aria-hidden className="pointer-events-none absolute inset-0 hidden overflow-hidden lg:block">
+      <div aria-hidden className="pointer-events-none absolute inset-0 z-0 hidden overflow-hidden lg:block">
         {particles.map((p, i) => (
           <span
             key={i}
@@ -110,7 +110,7 @@ export function Timeline({ items }: { items: Experience[] }) {
         return (
           <TimelineRow
             key={x.id}
-            className={`mb-18 flex flex-col items-center gap-6 last:mb-0 lg:mb-24 lg:gap-8 ${
+            className={`relative z-10 mb-18 flex flex-col items-center gap-6 last:mb-0 lg:mb-24 lg:gap-8 ${
               right ? "lg:flex-row-reverse" : "lg:flex-row"
             }`}
           >
@@ -206,17 +206,17 @@ export function Timeline({ items }: { items: Experience[] }) {
             </TimelineCard>
 
             {/* node on the centre line: icon badge with a year pill beneath */}
-            <div className="relative z-2 hidden flex-none flex-col items-center lg:flex">
+            <div className="relative z-20 hidden flex-none flex-col items-center lg:flex">
               <div
                 className={`h-16 w-16 rounded-full bg-gradient-to-br p-1 shadow-xl ring-2 ring-primary/30 ${
                   NODE_GRADIENTS[i % NODE_GRADIENTS.length]
                 }`}
               >
-                <div className="grid h-full w-full place-items-center rounded-full bg-card text-primary">
+                <div className="flex h-full w-full items-center justify-center rounded-full border-2 border-primary/20 bg-background text-foreground">
                   {NODE_ICONS[i % NODE_ICONS.length]}
                 </div>
               </div>
-              <span className="mt-3 whitespace-nowrap rounded-full border border-primary/30 bg-primary/10 px-3 py-1 text-[11px] font-semibold tabular-nums text-primary">
+              <span className="relative z-20 mt-[3px] translate-x-[45px] whitespace-nowrap rounded-full border-2 border-primary/50 bg-background px-3 py-[3px] text-xs font-semibold tabular-nums text-primary">
                 {yearLabel(x.start_date, x.end_date, x.is_current)}
               </span>
             </div>
