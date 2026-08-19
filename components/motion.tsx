@@ -1,7 +1,7 @@
 "use client";
 
-import { motion, useScroll, useSpring, useReducedMotion } from "framer-motion";
-import type { ReactNode } from "react";
+import { motion, useScroll, useSpring, useTransform, useReducedMotion } from "framer-motion";
+import { useRef, type ReactNode } from "react";
 
 /** The reference's FadeIn easing and duration, used everywhere. */
 const EASE = [0.25, 0.1, 0.25, 1] as const;
@@ -39,9 +39,11 @@ export function Reveal({
 }
 
 /**
- * A timeline row. Animates translateY(100px) scale(0.8) -> rest, and applies
- * the caller's flex classes to the animated element itself so the row's
- * children stay direct flex children.
+ * A timeline row, driven continuously by scroll rather than fired once:
+ * it rises in from translateY(100px) scale(0.8), holds while centred, then
+ * shrinks and fades back out as it leaves upward — matching the reference.
+ * The caller's flex classes go on the animated element so the row's children
+ * stay direct flex children.
  */
 export function TimelineRow({
   children,
@@ -51,16 +53,21 @@ export function TimelineRow({
   className?: string;
 }) {
   const reduce = useReducedMotion();
+  const ref = useRef<HTMLDivElement>(null);
+  const { scrollYProgress } = useScroll({
+    target: ref,
+    offset: ["start end", "end start"],
+  });
+
+  const p = useSpring(scrollYProgress, { stiffness: 140, damping: 30, restDelta: 0.001 });
+  const y = useTransform(p, [0, 0.35, 0.62, 1], [100, 0, 0, -100]);
+  const scale = useTransform(p, [0, 0.35, 0.62, 1], [0.8, 1, 1, 0.8]);
+  const opacity = useTransform(p, [0, 0.28, 0.72, 1], [0, 1, 1, 0]);
+
   if (reduce) return <div className={className}>{children}</div>;
 
   return (
-    <motion.div
-      className={className}
-      initial={{ opacity: 0, y: 100, scale: 0.8 }}
-      whileInView={{ opacity: 1, y: 0, scale: 1 }}
-      viewport={VIEWPORT}
-      transition={{ duration: DURATION, ease: EASE }}
-    >
+    <motion.div ref={ref} className={className} style={{ y, scale, opacity }}>
       {children}
     </motion.div>
   );
