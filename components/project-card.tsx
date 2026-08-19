@@ -60,10 +60,29 @@ export function ProjectCard({ project, index }: { project: Project; index: numbe
         />
         <div aria-hidden className="absolute left-8 top-8 h-28 w-28 rotate-[-8deg] rounded-3xl border border-white/20 bg-white/10 shadow-2xl backdrop-blur-xl" />
         <div aria-hidden className="absolute bottom-8 right-8 h-28 w-28 rounded-full border border-white/20 bg-black/10 shadow-2xl backdrop-blur-xl" />
-        <div aria-hidden className="absolute inset-x-10 top-10 h-20 rounded-full border border-white/20" />
+
+        {/* three concentric rings, each drifting on its own phase */}
+        <div aria-hidden className="absolute inset-0 flex items-center justify-center">
+          {[128, 178, 228].map((size, r) => (
+            <motion.span
+              key={size}
+              className="absolute rounded-full border border-white/15"
+              style={{ width: size, height: size }}
+              animate={reduce ? undefined : { rotate: [0, 45, 0], scale: [1, 1.15, 1], opacity: [0.3, 0.56, 0.3] }}
+              transition={{ duration: 5, repeat: Infinity, ease: "easeInOut", delay: r * 1.6 }}
+            />
+          ))}
+        </div>
+
+        <motion.div
+          aria-hidden
+          className="absolute inset-x-10 top-10 h-20 rounded-full border border-white/20"
+          animate={reduce ? undefined : { rotateX: [0, 12, 0], rotateY: [0, -10, 0] }}
+          transition={{ duration: 7, repeat: Infinity, ease: "easeInOut" }}
+        />
 
         <div className="relative z-10 flex h-full flex-col items-center justify-center px-5 text-center">
-          <div className={`mb-5 flex h-24 w-24 items-center justify-center rounded-3xl bg-gradient-to-br text-white shadow-2xl ring-1 ring-white/30 ${cover.badge}`}>
+          <div className={`mb-5 flex h-24 w-24 items-center justify-center rounded-3xl bg-gradient-to-br text-white shadow-2xl ring-1 ring-white/30 transition-transform duration-300 group-hover:scale-110 ${cover.badge}`}>
             {icon}
           </div>
           {project.features.length > 0 && (
@@ -141,6 +160,7 @@ export function ProjectCard({ project, index }: { project: Project; index: numbe
     <motion.div
       initial={reduce ? false : { opacity: 0, y: 30 }}
       whileInView={{ opacity: 1, y: 0 }}
+      whileHover={reduce ? undefined : { y: -8 }}
       viewport={{ once: true, margin: "50px" }}
       transition={{ duration: 0.7, ease: [0.25, 0.1, 0.25, 1], delay: (index % 3) * 0.08 }}
       className="h-full"
