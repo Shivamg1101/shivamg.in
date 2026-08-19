@@ -1,36 +1,76 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# shivamg.in
 
-## Getting Started
+My portfolio, and the CMS behind it. Built with Next.js 16 and Supabase.
 
-First, run the development server:
+Live at **[shivamg.in](https://shivamg.in)**.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+Nothing on the public site is hard-coded — the profile, roles, projects, case
+studies and the automation catalogue all come out of Postgres and are edited
+through an admin panel at `/admin`. The stat that reads "10 automations in
+production" is a live count of rows, not a number typed into a component.
+
+## Stack
+
+| | |
+|---|---|
+| Framework | Next.js 16 (App Router, Turbopack), React 19, TypeScript |
+| Styling | Tailwind v4, CSS-variable design tokens, light and dark themes |
+| Motion | Framer Motion — scroll-linked timeline, cursor-tracking card borders |
+| Data | Supabase — Postgres, Auth, row-level security |
+| Mail | Resend, behind a server route |
+
+## Layout
+
+```
+app/
+  (site)/            public pages, sharing one layout
+    page.tsx         hero, bento grid, stats, approach
+    about/           tabbed profile, skill matrix, expertise
+    experience/      alternating timeline, scroll-driven fill
+    projects/        project grid + automation catalogue
+    case-studies/    architecture deep dives
+    contact/         form, posts to the API route
+  admin/             CMS, auth-gated in proxy.ts
+  api/contact/       validates, stores, then emails
+components/
+  motion.tsx         shared animation primitives
+  structured-data.tsx  JSON-LD generated from the database
+lib/
+  admin-schema.ts    field definitions that drive the whole CMS
+  supabase/          browser and server clients
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## The CMS
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+`lib/admin-schema.ts` declares the fields for each collection, and a single
+generic editor renders the list and form for all of them. Adding a column to
+the admin panel is a few lines in that one file, not a new page.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Collections: profile, experience, projects, automations, write-ups, and
+contact messages.
 
-## Learn More
+## Security
 
-To learn more about Next.js, take a look at the following resources:
+- Row-level security on every table. Anonymous users may read published rows
+  and insert a contact message; nothing else.
+- Writes are gated on an `admins` email allowlist through a security-definer
+  function. The allowlist table has RLS enabled and no policies, so it is
+  unreachable through the API.
+- The contact endpoint validates server-side, mirrors the database
+  constraints, and drops bot submissions with a honeypot.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Running it
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+```bash
+npm install
+cp .env.example .env.local   # fill in your own Supabase project
+npm run dev
+```
 
-## Deploy on Vercel
+`RESEND_API_KEY` is optional. Without it, contact submissions are still
+stored — email is only a notification, never the record.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Credits
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Design direction adapted from [ali-ch.dev](https://www.ali-ch.dev), with the
+content, data model and implementation my own.
