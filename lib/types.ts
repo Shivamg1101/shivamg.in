@@ -42,6 +42,8 @@ export type Project = {
   live_url: string | null;
   repo_url: string | null;
   cover_url: string | null;
+  highlight: string | null;
+  features: string[];
   kind: ProjectKind;
   featured: boolean;
   published: boolean;

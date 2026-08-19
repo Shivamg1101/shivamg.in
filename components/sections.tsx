@@ -80,46 +80,6 @@ export function StackMarquee({ items }: { items: string[] }) {
   );
 }
 
-export function ProjectCard({ project }: { project: Project }) {
-  return (
-    <article className="card-hover group relative isolate overflow-hidden rounded-md border border-border bg-card p-6">
-      <span
-        aria-hidden
-        className="absolute inset-0 -z-10 bg-gradient-to-br from-primary/10 to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-40"
-      />
-      <h3 className="mb-2 text-[1.1rem] font-bold transition-colors group-hover:text-primary">
-        {project.title}
-      </h3>
-      <p className="text-[0.94rem] text-muted-foreground">{project.summary}</p>
-
-      {project.stack.length > 0 && (
-        <div className="mt-4 flex flex-wrap gap-1.5">
-          {project.stack.map((s) => (
-            <span
-              key={s}
-              className="rounded border border-border/60 bg-secondary px-2.5 py-1 text-[11.5px] font-semibold text-secondary-foreground"
-            >
-              {s}
-            </span>
-          ))}
-        </div>
-      )}
-
-      {project.live_url && (
-        <a
-          href={project.live_url}
-          target="_blank"
-          rel="noreferrer"
-          className="mt-4 inline-flex items-center gap-1.5 text-[13px] font-semibold text-primary hover:underline"
-        >
-          {project.live_url.replace(/^https?:\/\//, "")}
-          <span className="inline-block transition-transform duration-300 group-hover:translate-x-1">→</span>
-        </a>
-      )}
-    </article>
-  );
-}
-
 export function AutomationsTable({ rows }: { rows: Automation[] }) {
   return (
     <Reveal className="overflow-hidden rounded-md border border-border bg-card">
