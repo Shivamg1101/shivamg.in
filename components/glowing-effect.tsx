@@ -7,9 +7,9 @@ import { useCallback, useEffect, useRef } from "react";
  * Masked to the element's border box so only the 1px rim is painted.
  */
 export function GlowingEffect({
-  spread = 40,
+  spread = 80,
   proximity = 64,
-  borderWidth = 2,
+  borderWidth = 3,
   disabled = false,
 }: {
   spread?: number;
@@ -76,25 +76,46 @@ export function GlowingEffect({
           "--start": "0",
           "--spread": String(spread),
           "--bw": `${borderWidth}px`,
-          "--gradient": `conic-gradient(from calc((var(--start) - var(--spread)) * 1deg),
-            transparent 0deg,
-            hsl(var(--primary)) 20deg,
-            #3b82f6 40deg,
-            transparent calc(var(--spread) * 2deg))`,
+          // four-colour sweep: pink, gold, green, blue
+          "--gradient": `
+            radial-gradient(circle, #dd7bbb 10%, #dd7bbb00 20%),
+            radial-gradient(circle at 40% 40%, #d79f1e 5%, #d79f1e00 15%),
+            radial-gradient(circle at 60% 60%, #5a922c 10%, #5a922c00 20%),
+            radial-gradient(circle at 40% 60%, #4c7894 10%, #4c789400 20%),
+            repeating-conic-gradient(
+              from 236.84deg at 50% 50%,
+              #dd7bbb 0%,
+              #d79f1e calc(25% / 5),
+              #5a922c calc(50% / 5),
+              #4c7894 calc(75% / 5),
+              #dd7bbb calc(100% / 5)
+            )`,
         } as React.CSSProperties
       }
     >
+      {/* Two mask layers intersected: the first (clipped to padding-box) knocks
+          out the card interior, the second is a conic wedge aimed at the cursor.
+          What survives is a slice of the rim. */}
       <div
         className="absolute rounded-[inherit] opacity-[var(--active)] transition-opacity duration-300"
-        style={{
-          inset: "calc(-1 * var(--bw))",
-          border: "var(--bw) solid transparent",
-          background: "var(--gradient)",
-          WebkitMask:
-            "linear-gradient(#000 0 0) padding-box, linear-gradient(#000 0 0) border-box",
-          WebkitMaskComposite: "xor",
-          maskComposite: "exclude",
-        }}
+        style={
+          {
+            inset: "calc(-1 * var(--bw))",
+            border: "var(--bw) solid transparent",
+            background: "var(--gradient)",
+            backgroundAttachment: "fixed",
+            maskClip: "padding-box, border-box",
+            maskComposite: "intersect",
+            maskImage: `linear-gradient(#0000, #0000),
+              conic-gradient(from calc((var(--start) - var(--spread)) * 1deg),
+                #00000000 0deg, #fff, #00000000 calc(var(--spread) * 2deg))`,
+            WebkitMaskClip: "padding-box, border-box",
+            WebkitMaskComposite: "source-in",
+            WebkitMaskImage: `linear-gradient(#0000, #0000),
+              conic-gradient(from calc((var(--start) - var(--spread)) * 1deg),
+                #00000000 0deg, #fff, #00000000 calc(var(--spread) * 2deg))`,
+          } as React.CSSProperties
+        }
       />
     </div>
   );
