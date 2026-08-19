@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { motion, useReducedMotion } from "framer-motion";
 import type { Profile } from "@/lib/types";
@@ -291,13 +292,13 @@ export function Hero({ profile }: { profile: Profile }) {
               </div>
             </div>
 
-            <a
-              href="#contact"
+            <Link
+              href="/contact"
               className="group relative flex w-full items-center justify-center gap-2 overflow-hidden rounded-xl border-2 border-primary bg-card/80 px-6 py-3 font-semibold text-foreground backdrop-blur-sm transition-all duration-300 hover:bg-primary/5 hover:text-primary sm:w-auto"
             >
               <Rocket />
               <span>Let&rsquo;s Build Together</span>
-            </a>
+            </Link>
           </motion.div>
 
           {/* socials */}
