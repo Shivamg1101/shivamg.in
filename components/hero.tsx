@@ -4,7 +4,14 @@ import { useEffect, useMemo, useState } from "react";
 import { motion, useReducedMotion } from "framer-motion";
 import type { Profile } from "@/lib/types";
 
-const GREETINGS = ["Hi, I'm Shivam", "नमस्ते", "Hola", "Bonjour", "こんにちは"];
+/** The same introduction, cycled through a few languages. */
+const GREETINGS = [
+  "Hi, I'm Shivam",
+  "नमस्ते, मैं शिवम हूँ",
+  "Hola, soy Shivam",
+  "Bonjour, je suis Shivam",
+  "こんにちは、シヴァムです",
+];
 
 /* ------------------------------------------------------------------ *
  * Typewriter: types a greeting, holds, deletes, moves to the next.
@@ -221,11 +228,11 @@ export function Hero({ profile }: { profile: Profile }) {
             {...rise}
             className="mb-6 flex min-h-[1.2em] w-full items-center justify-center text-4xl font-bold sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl"
           >
-            <div className="bg-gradient-to-r from-foreground via-primary to-blue-500 bg-clip-text leading-tight text-transparent">
-              <span className="inline-flex min-h-[1.2em] items-baseline">
-                <span className="text-left">{greeting}</span>
-                <span className="ml-1 inline-block h-[0.8em] w-0.5 animate-pulse bg-primary" />
-              </span>
+            {/* plain inline, not inline-flex, so long greetings wrap on narrow
+                screens instead of running past the viewport */}
+            <div className="text-balance bg-gradient-to-r from-foreground via-primary to-blue-500 bg-clip-text leading-tight text-transparent">
+              <span>{greeting}</span>
+              <span className="ml-1 inline-block h-[0.8em] w-0.5 translate-y-[0.06em] animate-pulse bg-primary align-middle" />
             </div>
           </motion.div>
 
