@@ -19,6 +19,30 @@ export function SectionHead({
   );
 }
 
+export function PageHeader({
+  kicker,
+  title,
+  blurb,
+}: {
+  kicker: string;
+  title: string;
+  blurb?: string;
+}) {
+  return (
+    <section className="relative overflow-hidden border-b border-border bg-background pb-10 pt-16 dark:bg-black">
+      <div aria-hidden className="absolute -left-40 -top-40 h-72 w-72 rounded-full bg-primary/5 blur-3xl" />
+      <div aria-hidden className="absolute -right-40 -top-20 h-72 w-72 rounded-full bg-blue-500/5 blur-3xl" />
+      <div className="relative mx-auto max-w-6xl px-6">
+        <Reveal>
+          <div className="text-[12.5px] font-bold uppercase tracking-[0.1em] text-primary">{kicker}</div>
+          <h1 className="mt-3 text-3xl font-extrabold sm:text-4xl lg:text-5xl">{title}</h1>
+          {blurb && <p className="mt-4 max-w-[62ch] text-muted-foreground">{blurb}</p>}
+        </Reveal>
+      </div>
+    </section>
+  );
+}
+
 export function Stats({ stats }: { stats: { value: string; label: string }[] }) {
   return (
     <section className="py-14">

@@ -4,10 +4,10 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 
 const NAV = [
-  { label: "About", href: "/#about" },
-  { label: "Experience", href: "/#experience" },
-  { label: "Projects", href: "/#projects" },
-  { label: "Case Studies", href: "/#case-studies" },
+  { label: "About", href: "/about" },
+  { label: "Experience", href: "/experience" },
+  { label: "Projects", href: "/projects" },
+  { label: "Case Studies", href: "/case-studies" },
 ];
 
 function ThemeToggle() {
@@ -74,7 +74,7 @@ export function Header({ name }: { name: string }) {
         <div className="flex items-center gap-2.5">
           <ThemeToggle />
           <Link
-            href="/#contact"
+            href="/contact"
             className="rounded-md bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary/90"
           >
             Get in Touch
