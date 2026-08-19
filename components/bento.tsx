@@ -11,6 +11,8 @@ type Cell = {
   body: string;
   href?: string;
   stack?: string[];
+  ctaTitle?: string;
+  ctaBody?: string;
 };
 
 const Shield = () => (
@@ -50,6 +52,8 @@ const CELLS: Cell[] = [
     title: "Production-First",
     body: "Read-only dry runs and diagnostic probes before anything touches live data. Write operations stay disabled until the inputs are verified.",
     href: "/experience",
+    ctaTitle: "View Experience",
+    ctaBody: "How I build against live production systems",
   },
   {
     area: "md:[grid-area:1/7/2/13] xl:[grid-area:2/1/3/5]",
@@ -57,6 +61,8 @@ const CELLS: Cell[] = [
     title: "Operations at Scale",
     body: "1,200+ domains, 13 branches and ten workflows running unattended against real student records.",
     href: "/experience",
+    ctaTitle: "View Experience",
+    ctaBody: "The infrastructure underneath the automations",
   },
   {
     area: "md:[grid-area:2/1/3/7] xl:[grid-area:1/5/3/8]",
@@ -64,6 +70,8 @@ const CELLS: Cell[] = [
     title: "Modern Tech Stack",
     body: "Technologies and tools I use to build production systems",
     href: "/about",
+    ctaTitle: "About Me",
+    ctaBody: "The path from infrastructure to automation",
     stack: ["n8n", "OpenAI", "Qdrant", "Next.js", "NestJS", "Supabase", "PostgreSQL", "Docker"],
   },
   {
@@ -72,13 +80,17 @@ const CELLS: Cell[] = [
     title: "Retrieval-Grounded AI",
     body: "Agents that answer from source material and escalate to a human rather than guessing.",
     href: "/case-studies",
+    ctaTitle: "Read the Case Study",
+    ctaBody: "How the support agent stays grounded",
   },
   {
     area: "md:[grid-area:3/1/4/13] xl:[grid-area:2/8/3/13]",
     icon: <Send />,
     title: "Ready to Collaborate",
     body: "Let's build something that runs itself",
-    href: "/#contact",
+    href: "/contact",
+    ctaTitle: "Get in Touch",
+    ctaBody: "Open to AI & Automation roles",
   },
 ];
 
@@ -86,7 +98,7 @@ function Card({ cell, index }: { cell: Cell; index: number }) {
   const reduce = useReducedMotion();
 
   const inner = (
-    <div className="relative flex h-full flex-1 flex-col justify-between gap-3">
+    <div className="relative flex h-full flex-1 flex-col justify-between gap-3 transition-opacity duration-300 group-hover:opacity-10">
       <div className="w-fit rounded-lg border border-gray-400 p-2 text-primary dark:border-gray-600">
         {cell.icon}
       </div>
@@ -125,14 +137,30 @@ function Card({ cell, index }: { cell: Cell; index: number }) {
       transition={{ duration: 0.7, ease: [0.25, 0.1, 0.25, 1], delay: index * 0.08 }}
     >
       <div className="relative h-full rounded-2xl border border-border p-2 md:rounded-3xl md:p-3">
-        <GlowingEffect spread={40} proximity={64} borderWidth={2} disabled={Boolean(reduce)} />
+        <GlowingEffect spread={80} proximity={64} borderWidth={3} disabled={Boolean(reduce)} />
         <div className="relative flex h-full flex-col justify-between gap-6 overflow-hidden rounded-xl border border-gray-300/80 bg-white/90 p-6 backdrop-blur-sm dark:border-gray-800/50 dark:bg-black/80 dark:shadow-[0px_0px_27px_0px_#2D2D2D]">
           {cell.href ? (
             <Link
               href={cell.href}
-              className="group block h-full cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
+              className="group relative block h-full cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
             >
               {inner}
+              {cell.ctaTitle && (
+                <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center gap-2 px-4 text-center opacity-0 transition-opacity duration-300 group-hover:opacity-100">
+                  <span className="text-xl font-bold text-black md:text-2xl dark:text-white">
+                    {cell.ctaTitle}
+                  </span>
+                  {cell.ctaBody && (
+                    <span className="max-w-[26ch] text-sm text-neutral-600 dark:text-neutral-400">
+                      {cell.ctaBody}
+                    </span>
+                  )}
+                  <span className="mt-2 inline-flex items-center gap-1.5 text-sm font-semibold text-primary">
+                    Learn More
+                    <span className="transition-transform duration-300 group-hover:translate-x-1">→</span>
+                  </span>
+                </div>
+              )}
             </Link>
           ) : (
             inner
