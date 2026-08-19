@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState, useSyncExternalStore } from "react";
@@ -62,7 +63,6 @@ export function Header({ name }: { name: string }) {
   const pathname = usePathname();
   const reduce = useReducedMotion();
   const [open, setOpen] = useState(false);
-  const initials = name.split(" ").map((n) => n[0]).join("").slice(0, 2).toUpperCase();
 
   const isActive = (href: string) =>
     href === "/" ? pathname === "/" : pathname.startsWith(href);
@@ -82,8 +82,15 @@ export function Header({ name }: { name: string }) {
     <header className="sticky top-0 z-60 border-b border-border bg-background/80 backdrop-blur-md">
       <div className="mx-auto flex h-16 max-w-6xl items-center justify-between gap-5 px-6">
         <Link href="/" className="group flex items-center gap-3">
-          <span className="grid h-8 w-8 flex-none place-items-center rounded-full bg-gradient-to-br from-primary to-blue-600 text-[11px] font-extrabold text-white">
-            {initials}
+          <span className="relative block h-9 w-9 flex-none rounded-full bg-gradient-to-br from-primary to-blue-600 p-[1.5px] transition-transform duration-300 group-hover:scale-105">
+            <Image
+              src="/shivam.png"
+              alt=""
+              width={72}
+              height={72}
+              priority
+              className="h-full w-full rounded-full object-cover"
+            />
           </span>
           <span className="text-base font-extrabold tracking-tight">{name}</span>
         </Link>
