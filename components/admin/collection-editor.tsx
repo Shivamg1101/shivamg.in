@@ -142,6 +142,9 @@ export function CollectionEditor({ collection }: { collection: Collection }) {
   }, [collection]);
 
   useEffect(() => {
+    // Fetching on mount: the setState happens after the await inside load(),
+    // not synchronously in the effect body.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     load();
   }, [load]);
 

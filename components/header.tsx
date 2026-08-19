@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useSyncExternalStore } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 
 const NAV = [
@@ -13,16 +13,23 @@ const NAV = [
   { label: "Case Studies", href: "/case-studies" },
 ];
 
-function ThemeToggle() {
-  const [dark, setDark] = useState(false);
+/** Subscribes to the class the pre-paint script sets, so no state is
+ *  written from an effect and server and client agree on first render. */
+function subscribeTheme(cb: () => void) {
+  const mo = new MutationObserver(cb);
+  mo.observe(document.documentElement, { attributes: true, attributeFilter: ["class"] });
+  return () => mo.disconnect();
+}
 
-  useEffect(() => {
-    setDark(document.documentElement.classList.contains("dark"));
-  }, []);
+function ThemeToggle() {
+  const dark = useSyncExternalStore(
+    subscribeTheme,
+    () => document.documentElement.classList.contains("dark"),
+    () => false
+  );
 
   function toggle() {
     const next = !dark;
-    setDark(next);
     document.documentElement.classList.toggle("dark", next);
     try {
       localStorage.setItem("theme", next ? "dark" : "light");
@@ -60,8 +67,6 @@ export function Header({ name }: { name: string }) {
   const isActive = (href: string) =>
     href === "/" ? pathname === "/" : pathname.startsWith(href);
 
-  // close on route change, and on Escape
-  useEffect(() => setOpen(false), [pathname]);
   useEffect(() => {
     if (!open) return;
     const onKey = (e: KeyboardEvent) => e.key === "Escape" && setOpen(false);
@@ -172,6 +177,7 @@ export function Header({ name }: { name: string }) {
                     <li key={n.href}>
                       <Link
                         href={n.href}
+                        onClick={() => setOpen(false)}
                         aria-current={active ? "page" : undefined}
                         className={`flex items-center justify-between border-b border-border/60 py-3.5 text-base font-semibold transition-colors ${
                           active ? "text-primary" : "text-foreground hover:text-primary"
@@ -186,6 +192,7 @@ export function Header({ name }: { name: string }) {
               </ul>
               <Link
                 href="/contact"
+                onClick={() => setOpen(false)}
                 className="mt-5 flex justify-center rounded-lg bg-primary px-5 py-3 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary/90"
               >
                 Get in Touch

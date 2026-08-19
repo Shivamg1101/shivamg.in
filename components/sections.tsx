@@ -1,5 +1,5 @@
 import { Reveal } from "@/components/motion";
-import type { Automation, Profile, Project } from "@/lib/types";
+import type { Automation, Profile } from "@/lib/types";
 
 export function SectionHead({
   kicker,
