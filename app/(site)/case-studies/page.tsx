@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { BreadcrumbSchema, ProjectsSchema } from "@/components/structured-data";
 import { Reveal } from "@/components/motion";
 import { CaseStudyCard } from "@/components/case-study-card";
 import { getProjects } from "@/lib/queries";
@@ -6,6 +7,7 @@ import { getProjects } from "@/lib/queries";
 export const revalidate = 60;
 
 export const metadata: Metadata = {
+  alternates: { canonical: "/case-studies" },
   title: "Case Studies | Shivam Gupta",
   description:
     "Architecture deep dives — how the retrieval-grounded support agent and the nightly sales alerting actually work.",
@@ -16,6 +18,8 @@ export default async function CaseStudiesPage() {
 
   return (
     <>
+      <BreadcrumbSchema trail={[{ name: "Case Studies", path: "/case-studies" }]} />
+      <ProjectsSchema projects={studies} />
       {/* ---------------- hero ---------------- */}
       <section className="relative overflow-hidden bg-background pb-12 pt-16 dark:bg-black">
         <div aria-hidden className="absolute -left-40 -top-40 h-80 w-80 rounded-full bg-primary/5 blur-3xl" />

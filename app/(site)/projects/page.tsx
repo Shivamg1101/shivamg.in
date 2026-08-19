@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { BreadcrumbSchema, ProjectsSchema } from "@/components/structured-data";
 import { Reveal } from "@/components/motion";
 import { ProjectCard } from "@/components/project-card";
 import { AutomationsTable, SectionHead } from "@/components/sections";
@@ -7,6 +8,7 @@ import { getAutomations, getProjects } from "@/lib/queries";
 export const revalidate = 60;
 
 export const metadata: Metadata = {
+  alternates: { canonical: "/projects" },
   title: "Projects | Shivam Gupta",
   description:
     "Production automation, retrieval-grounded agents and full-stack platforms — built end to end, from data model to deployment.",
@@ -17,6 +19,8 @@ export default async function ProjectsPage() {
 
   return (
     <>
+      <BreadcrumbSchema trail={[{ name: "Projects", path: "/projects" }]} />
+      <ProjectsSchema projects={projects} />
       {/* ---------------- hero ---------------- */}
       <section className="relative overflow-hidden bg-background pb-12 pt-16 dark:bg-black">
         <div aria-hidden className="absolute -left-40 -top-40 h-80 w-80 rounded-full bg-primary/5 blur-3xl" />

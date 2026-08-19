@@ -1,3 +1,5 @@
+import type { Metadata } from "next";
+import { ProjectsSchema } from "@/components/structured-data";
 import { Hero } from "@/components/hero";
 import { Bento } from "@/components/bento";
 import { Approach } from "@/components/approach";
@@ -5,6 +7,13 @@ import { Stats, StackMarquee } from "@/components/sections";
 import { getAutomations, getProfile, getProjects } from "@/lib/queries";
 
 export const revalidate = 60;
+
+export const metadata: Metadata = {
+  alternates: { canonical: "/" },
+  title: "Shivam Gupta | AI & Automation Engineer",
+  description:
+    "Ten automations running in production, a retrieval-grounded support agent, and the full-stack platforms underneath them.",
+};
 
 export default async function Home() {
   const [profile, projects, automations] = await Promise.all([
@@ -37,6 +46,7 @@ export default async function Home() {
 
   return (
     <>
+      <ProjectsSchema projects={projects} />
       <Hero profile={profile} />
       <Bento />
       <Stats stats={stats} />
