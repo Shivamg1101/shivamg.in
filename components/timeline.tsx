@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo, useRef } from "react";
-import { StaggerItem, TimelineFill, TimelineReveal } from "@/components/motion";
+import { StaggerItem, TimelineCard, TimelineFill, TimelineRow } from "@/components/motion";
 import { formatRange, type Experience } from "@/lib/types";
 
 const NODE_GRADIENTS = [
@@ -76,14 +76,13 @@ export function Timeline({ items }: { items: Experience[] }) {
       {items.map((x, i) => {
         const right = i % 2 === 1;
         return (
-          <TimelineReveal
+          <TimelineRow
             key={x.id}
-            fromRight={right}
-            className={`mb-18 flex flex-col items-center gap-6 last:mb-0 lg:mb-24 lg:gap-14 ${
+            className={`mb-18 flex flex-col items-center gap-6 last:mb-0 lg:mb-24 lg:gap-8 ${
               right ? "lg:flex-row-reverse" : "lg:flex-row"
             }`}
           >
-            <div className="w-full min-w-0 flex-1">
+            <TimelineCard fromRight={right} className="w-full min-w-0 flex-1">
               <article
                 className={`card-hover group relative overflow-hidden rounded-2xl border bg-card/60 p-7 shadow-xl backdrop-blur-sm ${
                   x.is_current ? "border-primary/40 ring-1 ring-primary/20" : "border-border"
@@ -99,7 +98,7 @@ export function Timeline({ items }: { items: Experience[] }) {
                         Current Role
                       </span>
                     )}
-                    <h3 className="mb-2 text-2xl font-bold transition-colors group-hover:text-primary">
+                    <h3 className="mb-2 text-xl font-bold transition-colors group-hover:text-primary">
                       {x.title}
                     </h3>
                     <div className="mb-3 flex flex-wrap items-center gap-3">
@@ -115,7 +114,7 @@ export function Timeline({ items }: { items: Experience[] }) {
                     </div>
                   </div>
 
-                  <div className="inline-flex items-center gap-2 whitespace-nowrap rounded-xl bg-gradient-to-r from-violet-500 to-purple-600 px-4 py-2 text-[13px] font-semibold text-white shadow-lg shadow-violet-500/30">
+                  <div className="inline-flex items-center gap-2 whitespace-nowrap rounded-xl bg-gradient-to-r from-violet-500 to-purple-600 px-4 py-2 text-xs font-semibold text-white shadow-lg shadow-violet-500/30">
                     <Calendar />
                     {formatRange(x.start_date, x.end_date, x.is_current)}
                   </div>
@@ -172,7 +171,7 @@ export function Timeline({ items }: { items: Experience[] }) {
                   </>
                 )}
               </article>
-            </div>
+            </TimelineCard>
 
             {/* node on the centre line */}
             <div
@@ -186,7 +185,7 @@ export function Timeline({ items }: { items: Experience[] }) {
             </div>
 
             <div className="hidden flex-1 lg:block" />
-          </TimelineReveal>
+          </TimelineRow>
         );
       })}
     </div>

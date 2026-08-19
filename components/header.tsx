@@ -51,7 +51,7 @@ function ThemeToggle() {
 export function Header({ name }: { name: string }) {
   return (
     <header className="sticky top-0 z-60 border-b border-border bg-background/80 backdrop-blur-md">
-      <div className="mx-auto flex h-16 max-w-5xl items-center justify-between gap-5 px-6">
+      <div className="mx-auto flex h-16 max-w-6xl items-center justify-between gap-5 px-6">
         <Link href="/" className="text-base font-extrabold tracking-tight">
           {name}
         </Link>
