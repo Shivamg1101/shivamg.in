@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import { motion, useReducedMotion } from "framer-motion";
 import type { Profile } from "@/lib/types";
 
-const GREETINGS = ["Hello", "नमस्ते", "Hola", "Bonjour", "こんにちは"];
+const GREETINGS = ["Hi, I'm Shivam", "नमस्ते", "Hola", "Bonjour", "こんにちは"];
 
 /* ------------------------------------------------------------------ *
  * Typewriter: types a greeting, holds, deletes, moves to the next.
