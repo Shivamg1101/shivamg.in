@@ -83,6 +83,8 @@ export const COLLECTIONS: Record<string, Collection> = {
       { key: "slug", label: "Slug", type: "text", required: true, help: "URL-safe, unique" },
       { key: "summary", label: "Summary", type: "textarea", required: true },
       { key: "body", label: "Detail", type: "markdown" },
+      { key: "highlight", label: "Highlight line", type: "textarea", help: "Shown in the tinted box on the card" },
+      { key: "features", label: "Cover pills", type: "list", help: "Two or three short labels, one per line" },
       { key: "stack", label: "Stack", type: "list", help: "One per line" },
       { key: "live_url", label: "Live URL", type: "text" },
       { key: "repo_url", label: "Repo URL", type: "text" },
