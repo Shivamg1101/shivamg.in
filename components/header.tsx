@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
-import { motion, useReducedMotion } from "framer-motion";
+import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 
 const NAV = [
   { label: "Home", href: "/" },
@@ -54,22 +54,37 @@ function ThemeToggle() {
 export function Header({ name }: { name: string }) {
   const pathname = usePathname();
   const reduce = useReducedMotion();
+  const [open, setOpen] = useState(false);
   const initials = name.split(" ").map((n) => n[0]).join("").slice(0, 2).toUpperCase();
 
   const isActive = (href: string) =>
     href === "/" ? pathname === "/" : pathname.startsWith(href);
 
+  // close on route change, and on Escape
+  useEffect(() => setOpen(false), [pathname]);
+  useEffect(() => {
+    if (!open) return;
+    const onKey = (e: KeyboardEvent) => e.key === "Escape" && setOpen(false);
+    window.addEventListener("keydown", onKey);
+    document.body.style.overflow = "hidden";
+    return () => {
+      window.removeEventListener("keydown", onKey);
+      document.body.style.overflow = "";
+    };
+  }, [open]);
+
   return (
     <header className="sticky top-0 z-60 border-b border-border bg-background/80 backdrop-blur-md">
       <div className="mx-auto flex h-16 max-w-6xl items-center justify-between gap-5 px-6">
         <Link href="/" className="group flex items-center gap-3">
-          <span className="grid h-8 w-8 place-items-center rounded-full bg-gradient-to-br from-primary to-blue-600 text-[11px] font-extrabold text-white">
+          <span className="grid h-8 w-8 flex-none place-items-center rounded-full bg-gradient-to-br from-primary to-blue-600 text-[11px] font-extrabold text-white">
             {initials}
           </span>
           <span className="text-base font-extrabold tracking-tight">{name}</span>
         </Link>
 
-        <nav className="hidden lg:block">
+        {/* desktop / tablet nav */}
+        <nav className="hidden md:block">
           <ul className="flex items-center gap-1">
             {NAV.map((n) => {
               const active = isActive(n.href);
@@ -78,18 +93,18 @@ export function Header({ name }: { name: string }) {
                   <Link
                     href={n.href}
                     aria-current={active ? "page" : undefined}
-                    className={`relative rounded-lg px-4 py-2 text-[15px] font-semibold transition-colors duration-200 ${
+                    className={`relative rounded-lg px-3 py-2 text-sm font-semibold transition-colors duration-200 lg:px-4 lg:text-[15px] ${
                       active ? "text-primary" : "text-muted-foreground hover:text-foreground"
                     }`}
                   >
                     {n.label}
                     {active &&
                       (reduce ? (
-                        <span className="absolute inset-x-4 -bottom-[9px] h-0.5 rounded-full bg-primary" />
+                        <span className="absolute inset-x-3 -bottom-[9px] h-0.5 rounded-full bg-primary lg:inset-x-4" />
                       ) : (
                         <motion.span
                           layoutId="nav-active"
-                          className="absolute inset-x-4 -bottom-[9px] h-0.5 rounded-full bg-primary"
+                          className="absolute inset-x-3 -bottom-[9px] h-0.5 rounded-full bg-primary lg:inset-x-4"
                           transition={{ type: "spring", stiffness: 380, damping: 32 }}
                         />
                       ))}
@@ -104,12 +119,81 @@ export function Header({ name }: { name: string }) {
           <ThemeToggle />
           <Link
             href="/contact"
-            className="rounded-lg bg-primary px-5 py-2 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary/90"
+            className="hidden rounded-lg bg-primary px-5 py-2 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary/90 sm:inline-flex"
           >
             Get in Touch
           </Link>
+
+          {/* mobile menu trigger */}
+          <button
+            onClick={() => setOpen((v) => !v)}
+            aria-label={open ? "Close menu" : "Open menu"}
+            aria-expanded={open}
+            aria-controls="mobile-menu"
+            className="grid h-9 w-9 place-items-center rounded-lg border border-border text-foreground transition-colors hover:bg-secondary md:hidden"
+          >
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden>
+              {open ? (
+                <path d="M18 6 6 18M6 6l12 12" />
+              ) : (
+                <path d="M3 6h18M3 12h18M3 18h18" />
+              )}
+            </svg>
+          </button>
         </div>
       </div>
+
+      {/* mobile drawer */}
+      <AnimatePresence>
+        {open && (
+          <>
+            <motion.button
+              aria-label="Close menu"
+              tabIndex={-1}
+              onClick={() => setOpen(false)}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.2 }}
+              className="fixed inset-0 top-16 z-40 cursor-default bg-background/60 backdrop-blur-sm md:hidden"
+            />
+            <motion.nav
+              id="mobile-menu"
+              initial={reduce ? false : { opacity: 0, y: -12 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={reduce ? undefined : { opacity: 0, y: -12 }}
+              transition={{ duration: 0.25, ease: [0.25, 0.1, 0.25, 1] }}
+              className="absolute inset-x-0 top-16 z-50 border-b border-border bg-background px-6 pb-5 pt-2 shadow-xl md:hidden"
+            >
+              <ul className="grid">
+                {NAV.map((n) => {
+                  const active = isActive(n.href);
+                  return (
+                    <li key={n.href}>
+                      <Link
+                        href={n.href}
+                        aria-current={active ? "page" : undefined}
+                        className={`flex items-center justify-between border-b border-border/60 py-3.5 text-base font-semibold transition-colors ${
+                          active ? "text-primary" : "text-foreground hover:text-primary"
+                        }`}
+                      >
+                        {n.label}
+                        {active && <span className="h-1.5 w-1.5 rounded-full bg-primary" />}
+                      </Link>
+                    </li>
+                  );
+                })}
+              </ul>
+              <Link
+                href="/contact"
+                className="mt-5 flex justify-center rounded-lg bg-primary px-5 py-3 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary/90"
+              >
+                Get in Touch
+              </Link>
+            </motion.nav>
+          </>
+        )}
+      </AnimatePresence>
     </header>
   );
 }
