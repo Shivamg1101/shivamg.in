@@ -1,0 +1,754 @@
+<title>Shivam Gupta Portfolio</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400&display=swap">
+
+<style>
+/* ---- tokens: light is the default, exactly as on the reference ---- */
+:root{
+  --background:30 15% 96%;
+  --foreground:0 0% 15%;
+  --card:30 20% 98%;
+  --card-foreground:0 0% 15%;
+  --primary:262 83% 58%;
+  --primary-foreground:0 0% 99%;
+  --secondary:30 10% 92%;
+  --secondary-foreground:0 0% 35%;
+  --muted:30 15% 94%;
+  --muted-foreground:0 0% 40%;
+  --accent:262 83% 95%;
+  --accent-foreground:262 83% 45%;
+  --border:30 8% 88%;
+  --ring:262 83% 58%;
+  --radius:0.5rem;
+  --success:152 60% 36%;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --background:0 0% 0%;
+    --foreground:0 0% 98%;
+    --card:0 0% 3%;
+    --card-foreground:0 0% 98%;
+    --primary:262 83% 70%;
+    --primary-foreground:0 0% 0%;
+    --secondary:0 0% 5%;
+    --secondary-foreground:0 0% 85%;
+    --muted:0 0% 5%;
+    --muted-foreground:0 0% 75%;
+    --accent:262 83% 70%;
+    --accent-foreground:0 0% 0%;
+    --border:0 0% 18%;
+    --ring:262 83% 70%;
+    --success:152 55% 55%;
+  }
+}
+:root[data-theme="dark"]{
+  --background:0 0% 0%;
+  --foreground:0 0% 98%;
+  --card:0 0% 3%;
+  --card-foreground:0 0% 98%;
+  --primary:262 83% 70%;
+  --primary-foreground:0 0% 0%;
+  --secondary:0 0% 5%;
+  --secondary-foreground:0 0% 85%;
+  --muted:0 0% 5%;
+  --muted-foreground:0 0% 75%;
+  --accent:262 83% 70%;
+  --accent-foreground:0 0% 0%;
+  --border:0 0% 18%;
+  --ring:262 83% 70%;
+  --success:152 55% 55%;
+}
+
+*{box-sizing:border-box}
+body{
+  margin:0; background:hsl(var(--background)); color:hsl(var(--foreground));
+  font-family:"Plus Jakarta Sans",ui-sans-serif,system-ui,sans-serif;
+  font-size:16px; line-height:1.65; -webkit-font-smoothing:antialiased;
+}
+h1,h2,h3,h4{margin:0; text-wrap:balance; letter-spacing:-.025em; line-height:1.15; font-weight:700}
+p{margin:0}
+a{color:inherit; text-decoration:none}
+.wrap{max-width:1080px; margin:0 auto; padding:0 24px}
+.mut{color:hsl(var(--muted-foreground))}
+
+/* scroll progress */
+#prog{position:fixed; top:0; left:0; height:2px; width:0; z-index:100;
+  background:hsl(var(--primary)); transition:width .1s linear}
+
+.skip{position:absolute; left:-9999px; top:0; z-index:200; padding:10px 16px;
+  background:hsl(var(--primary)); color:hsl(var(--primary-foreground));
+  border-radius:var(--radius)}
+.skip:focus{left:12px; top:12px}
+
+/* header */
+header{position:sticky; top:0; z-index:60; backdrop-filter:blur(12px);
+  background:hsl(var(--background)/.82); border-bottom:1px solid hsl(var(--border))}
+.hrow{display:flex; align-items:center; justify-content:space-between; gap:20px; height:64px}
+.logo{font-weight:800; font-size:16px; letter-spacing:-.02em}
+nav ul{display:flex; gap:26px; list-style:none; margin:0; padding:0}
+nav a{font-size:14px; font-weight:500; color:hsl(var(--muted-foreground));
+  transition:color .18s ease}
+nav a:hover,nav a:focus-visible{color:hsl(var(--foreground))}
+.hact{display:flex; align-items:center; gap:10px}
+.btn{display:inline-flex; align-items:center; gap:8px; border-radius:var(--radius);
+  font-size:14px; font-weight:600; padding:9px 16px; cursor:pointer; border:1px solid transparent;
+  font-family:inherit; transition:background .18s ease,border-color .18s ease,color .18s ease}
+.btn-p{background:hsl(var(--primary)); color:hsl(var(--primary-foreground))}
+.btn-p:hover{background:hsl(var(--primary)/.9)}
+.btn-o{background:transparent; border-color:hsl(var(--border)); color:hsl(var(--foreground))}
+.btn-o:hover{background:hsl(var(--secondary))}
+.icobtn{width:36px; height:36px; display:grid; place-items:center; border-radius:var(--radius);
+  border:1px solid hsl(var(--border)); background:transparent; cursor:pointer;
+  color:hsl(var(--foreground))}
+.icobtn:hover{background:hsl(var(--secondary))}
+.icobtn svg{width:16px; height:16px}
+:root[data-theme="dark"] .ico-sun,
+:root:not([data-theme="light"]) .ico-sun{display:none}
+:root[data-theme="dark"] .ico-moon,
+:root:not([data-theme="light"]) .ico-moon{display:block}
+.ico-moon{display:none}
+@media (prefers-color-scheme:light){
+  :root:not([data-theme="dark"]) .ico-sun{display:block}
+  :root:not([data-theme="dark"]) .ico-moon{display:none}
+}
+:root[data-theme="light"] .ico-sun{display:block}
+:root[data-theme="light"] .ico-moon{display:none}
+
+/* reveal */
+.rv{opacity:0; transform:translateY(22px);
+  transition:opacity .5s cubic-bezier(0,0,.2,1),transform .6s cubic-bezier(.17,.89,.32,1.14)}
+.rv.in{opacity:1; transform:none}
+/* his timeline rows enter with translateY(100px) scale(.8); cards slide in from their side */
+.rv-tl{opacity:0; transform:translateY(70px) scale(.9);
+  transition:opacity .6s cubic-bezier(0,0,.2,1),transform .7s cubic-bezier(.17,.89,.32,1.14)}
+.rv-tl.in{opacity:1; transform:none}
+.rv-l{opacity:0; transform:translateX(-40px)}
+.rv-r{opacity:0; transform:translateX(40px)}
+.rv-l,.rv-r{transition:opacity .6s cubic-bezier(0,0,.2,1),transform .6s cubic-bezier(0,0,.2,1)}
+.rv-l.in,.rv-r.in{opacity:1; transform:none}
+
+/* hero */
+.hero{padding:88px 0 64px}
+.avail{display:inline-flex; align-items:center; gap:8px; font-size:13px; font-weight:500;
+  padding:5px 12px; border-radius:999px; background:hsl(var(--accent));
+  color:hsl(var(--accent-foreground)); border:1px solid hsl(var(--primary)/.22)}
+.dot{position:relative; width:7px; height:7px; border-radius:50%; background:hsl(var(--success)); flex:none}
+.dot::after{content:''; position:absolute; inset:0; border-radius:50%;
+  background:hsl(var(--success)); animation:ping 1.8s cubic-bezier(0,0,.2,1) infinite}
+@keyframes ping{75%,100%{transform:scale(2.4); opacity:0}}
+.hero h1{font-size:clamp(2.2rem,5.4vw,3.4rem); font-weight:800; margin:20px 0 0}
+/* his `gradient-x` keyframe: a 200%-wide gradient sliding under clipped text */
+.hero h1 .gx{background:linear-gradient(90deg,
+    hsl(var(--foreground)), hsl(var(--primary)), hsl(var(--foreground)));
+  background-size:200% 100%; -webkit-background-clip:text; background-clip:text;
+  -webkit-text-fill-color:transparent; color:transparent;
+  animation:gradient-x 6s ease infinite}
+@keyframes gradient-x{0%,100%{background-position:0% 50%}50%{background-position:100% 50%}}
+.hero .sub{font-size:clamp(1rem,2vw,1.2rem); font-weight:600; margin-top:12px;
+  color:hsl(var(--primary))}
+.hero .lede{margin-top:18px; max-width:60ch; color:hsl(var(--muted-foreground)); font-size:1.03rem}
+.hero .acts{display:flex; gap:12px; margin-top:28px; flex-wrap:wrap}
+.stats{display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:16px; margin-top:44px}
+.stat{border:1px solid hsl(var(--border)); border-radius:var(--radius);
+  background:hsl(var(--card)); padding:18px 20px}
+.stat b{display:block; font-size:1.65rem; font-weight:800; letter-spacing:-.03em;
+  font-variant-numeric:tabular-nums}
+.stat span{font-size:12.5px; color:hsl(var(--muted-foreground)); font-weight:500}
+
+/* marquee (their `scroll` keyframe) */
+.strip{border-block:1px solid hsl(var(--border)); background:hsl(var(--muted));
+  overflow:hidden; padding:14px 0; margin-top:56px;
+  -webkit-mask-image:linear-gradient(90deg,transparent,#000 12%,#000 88%,transparent);
+  mask-image:linear-gradient(90deg,transparent,#000 12%,#000 88%,transparent)}
+.strip ul{display:flex; gap:36px; list-style:none; margin:0; padding:0; width:max-content;
+  animation:scroll 32s linear infinite}
+@keyframes scroll{to{transform:translate(calc(-50% - 18px))}}
+.strip li{font-size:13.5px; font-weight:600; color:hsl(var(--muted-foreground)); white-space:nowrap}
+.strip:hover ul{animation-play-state:paused}
+
+/* sections */
+section{padding:72px 0; scroll-margin-top:72px}
+.shead{margin-bottom:32px}
+.kicker{font-size:12.5px; font-weight:700; letter-spacing:.1em; text-transform:uppercase;
+  color:hsl(var(--primary))}
+.shead h2{font-size:clamp(1.5rem,3vw,2rem); margin-top:8px}
+.shead p{margin-top:10px; color:hsl(var(--muted-foreground)); max-width:62ch}
+
+/* card = "group": lift + violet shadow + overlay wash + title/arrow shifts, all 300ms ease-out */
+.card{position:relative; overflow:hidden; isolation:isolate;
+  border:1px solid hsl(var(--border)); border-radius:var(--radius);
+  background:hsl(var(--card)); padding:24px;
+  transition:transform .3s cubic-bezier(0,0,.2,1), border-color .3s cubic-bezier(0,0,.2,1),
+             box-shadow .3s cubic-bezier(0,0,.2,1)}
+.card::before{content:''; position:absolute; inset:0; z-index:-1; opacity:0;
+  background:linear-gradient(135deg,hsl(var(--primary)/.10),transparent 60%);
+  transition:opacity .3s cubic-bezier(0,0,.2,1)}
+.card:hover{transform:translateY(-4px); border-color:hsl(var(--primary)/.45);
+  box-shadow:0 10px 30px -10px hsl(var(--primary)/.20)}
+.card:hover::before{opacity:.4}
+.card:hover h3{color:hsl(var(--primary))}
+.card h3{transition:color .3s cubic-bezier(0,0,.2,1)}
+.card:hover .arw{transform:translateX(.25rem)}
+.arw{display:inline-block; transition:transform .3s cubic-bezier(0,0,.2,1)}
+.stat{transition:transform .3s cubic-bezier(0,0,.2,1), border-color .3s cubic-bezier(0,0,.2,1)}
+.stat:hover{transform:translateY(-4px); border-color:hsl(var(--primary)/.45)}
+.stat:hover b{color:hsl(var(--primary))}
+.stat b{transition:color .3s cubic-bezier(0,0,.2,1)}
+
+/* experience — alternating centre-line timeline with scroll-driven fill */
+.tl{position:relative; padding:8px 0}
+.tl-line{position:absolute; left:50%; top:0; bottom:0; width:3px; transform:translateX(-50%);
+  background:linear-gradient(180deg,transparent,hsl(var(--border)),transparent); display:none}
+.tl-fill{width:100%; height:100%; transform:scaleY(0); transform-origin:top;
+  background:linear-gradient(180deg,hsl(var(--primary)),#3b82f6,#a855f7)}
+.tl-parts{position:absolute; inset:0; overflow:hidden; pointer-events:none; display:none}
+.tl-parts i{position:absolute; width:8px; height:8px; border-radius:50%;
+  background:hsl(var(--primary)/.2); animation:drift 9s ease-in-out infinite}
+@keyframes drift{0%,100%{transform:translateY(0)}50%{transform:translateY(-14px)}}
+.tl-item{display:flex; flex-direction:column; align-items:center; gap:24px; margin-bottom:72px}
+.tl-item:last-child{margin-bottom:0}
+.tl-side{flex:1; width:100%; min-width:0}
+.tl-spacer{display:none}
+.tl-node{position:relative; z-index:2; width:64px; height:64px; border-radius:50%; padding:4px;
+  flex:none; box-shadow:0 10px 25px -8px rgba(0,0,0,.45);
+  box-shadow:0 10px 25px -8px hsl(var(--primary)/.5), 0 0 0 2px hsl(var(--primary)/.3)}
+.tl-node .in{width:100%; height:100%; border-radius:50%; display:grid; place-items:center;
+  background:hsl(var(--card)); color:hsl(var(--foreground)); font-weight:800; font-size:13px}
+.n1{background:linear-gradient(135deg,#3b82f6,#06b6d4)}
+.n2{background:linear-gradient(135deg,#22c55e,#10b981)}
+
+.xcard{position:relative; overflow:hidden; border:1px solid hsl(var(--border));
+  border-radius:1.25rem; padding:28px; background:hsl(var(--card)/.6); backdrop-filter:blur(8px);
+  box-shadow:0 22px 45px -28px rgba(0,0,0,.5);
+  transition:border-color .5s cubic-bezier(0,0,.2,1), box-shadow .5s cubic-bezier(0,0,.2,1),
+             transform .5s cubic-bezier(0,0,.2,1)}
+.xcard:hover{border-color:hsl(var(--primary)/.4); transform:translateY(-4px);
+  box-shadow:0 26px 55px -26px hsl(var(--primary)/.35)}
+.xcard.current{border-color:hsl(var(--primary)/.4); box-shadow:0 0 0 1px hsl(var(--primary)/.2)}
+.xcard .corner{position:absolute; top:16px; right:16px; width:12px; height:12px; border-radius:50%;
+  background:linear-gradient(90deg,#eab308,#f97316); opacity:.5;
+  transition:opacity .3s cubic-bezier(0,0,.2,1)}
+.xcard:hover .corner{opacity:1}
+.xtop{display:flex; align-items:flex-start; justify-content:space-between; gap:12px;
+  flex-wrap:wrap; margin-bottom:22px}
+.cur-pill{display:inline-flex; align-items:center; gap:8px; margin-bottom:12px;
+  border-radius:999px; padding:4px 12px; font-size:12px; font-weight:700;
+  border:1px solid hsl(142 71% 45%/.3); background:hsl(142 71% 45%/.1); color:hsl(142 62% 32%)}
+:root[data-theme="dark"] .cur-pill{color:hsl(142 70% 72%)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .cur-pill{color:hsl(142 70% 72%)}}
+.cur-pill i{width:8px; height:8px; border-radius:50%; background:hsl(142 71% 45%); display:block}
+.xcard h3{font-size:1.4rem; font-weight:700; margin-bottom:8px;
+  transition:color .3s cubic-bezier(0,0,.2,1)}
+.xcard:hover h3{color:hsl(var(--primary))}
+.xmeta{display:flex; flex-wrap:wrap; align-items:center; gap:12px; margin-bottom:12px}
+.xco{display:inline-flex; align-items:center; gap:8px; color:hsl(var(--primary));
+  font-weight:600; font-size:1.05rem}
+.xco svg{width:16px; height:16px}
+.xloc{border-radius:999px; border:1px solid hsl(var(--border)/.5); background:hsl(var(--muted)/.4);
+  padding:4px 12px; font-size:12px; font-weight:600; color:hsl(var(--muted-foreground))}
+.xdate{display:inline-flex; align-items:center; gap:8px; padding:8px 16px; border-radius:.75rem;
+  background:linear-gradient(90deg,#8b5cf6,#9333ea); color:#fff; font-weight:600; font-size:13px;
+  box-shadow:0 8px 20px -8px rgba(139,92,246,.7); white-space:nowrap}
+.xdate svg{width:15px; height:15px}
+.mchips{display:grid; gap:8px; margin-bottom:20px}
+@media(min-width:520px){.mchips{grid-template-columns:1fr 1fr}}
+.mchip{border-radius:.75rem; border:1px solid hsl(var(--primary)/.15); background:hsl(var(--primary)/.1);
+  padding:8px 12px; font-size:12px; font-weight:700; color:hsl(var(--primary))}
+.ttags{display:flex; flex-wrap:wrap; gap:8px; margin-bottom:20px}
+.ttag{border-radius:999px; border:1px solid hsl(var(--border)/.5); background:hsl(var(--muted)/.4);
+  padding:4px 12px; font-size:12px; font-weight:500; color:hsl(var(--muted-foreground))}
+.xsum{color:hsl(var(--muted-foreground)); margin-bottom:24px; line-height:1.7}
+.ach-h{display:flex; align-items:center; gap:8px; margin-bottom:16px}
+.ach-h svg{width:20px; height:20px; color:hsl(var(--primary))}
+.ach-h h4{font-size:1.05rem; font-weight:600}
+.ach-grid{display:grid; gap:12px}
+.ach{display:flex; align-items:flex-start; gap:16px; padding:16px; border-radius:.75rem;
+  background:linear-gradient(90deg,hsl(var(--primary)/.05),transparent);
+  border:1px solid hsl(var(--primary)/.1);
+  transition:border-color .3s cubic-bezier(0,0,.2,1)}
+.ach:hover{border-color:hsl(var(--primary)/.3)}
+.ach b{width:8px; height:8px; border-radius:50%; flex:none; margin-top:9px;
+  background:linear-gradient(90deg,#8b5cf6,#9333ea);
+  transition:transform .3s cubic-bezier(0,0,.2,1)}
+.ach:hover b{transform:scale(1.25)}
+.ach span{font-size:.9rem; line-height:1.65; color:hsl(var(--muted-foreground));
+  transition:color .3s cubic-bezier(0,0,.2,1)}
+.ach:hover span{color:hsl(var(--foreground))}
+
+@media(min-width:1024px){
+  .tl-line,.tl-parts{display:block}
+  .tl-item{flex-direction:row; align-items:center; gap:56px; margin-bottom:96px}
+  .tl-spacer{display:block; flex:1}
+  .tl-item.right{flex-direction:row-reverse}
+}
+
+/* projects */
+.grid2{display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:16px}
+.proj h3{font-size:1.1rem; margin-bottom:8px}
+.proj p{color:hsl(var(--muted-foreground)); font-size:.94rem}
+.tags{display:flex; flex-wrap:wrap; gap:6px; margin-top:16px}
+.tag{font-size:11.5px; font-weight:600; padding:3px 9px; border-radius:4px;
+  background:hsl(var(--secondary)); color:hsl(var(--secondary-foreground))}
+.plink{display:inline-flex; align-items:center; gap:6px; margin-top:16px; font-size:13px;
+  font-weight:600; color:hsl(var(--primary))}
+.plink:hover{text-decoration:underline}
+
+/* case studies */
+.cs{display:grid; gap:16px}
+.cs .row{display:grid; grid-template-columns:1fr auto; gap:24px; align-items:start}
+.cs h3{font-size:1.15rem; margin-bottom:8px}
+.cs p{color:hsl(var(--muted-foreground)); font-size:.95rem}
+.metrics{display:flex; gap:22px; flex-wrap:wrap; margin-top:18px;
+  padding-top:16px; border-top:1px solid hsl(var(--border))}
+.metric b{display:block; font-size:1.2rem; font-weight:800; font-variant-numeric:tabular-nums;
+  color:hsl(var(--primary))}
+.metric span{font-size:12px; color:hsl(var(--muted-foreground)); font-weight:500}
+
+/* automations table */
+.tblwrap{border:1px solid hsl(var(--border)); border-radius:var(--radius); overflow:hidden;
+  background:hsl(var(--card))}
+.tscroll{overflow-x:auto}
+table{width:100%; border-collapse:collapse; min-width:600px}
+th{text-align:left; font-size:11.5px; font-weight:700; letter-spacing:.06em; text-transform:uppercase;
+  color:hsl(var(--muted-foreground)); padding:12px 18px;
+  border-bottom:1px solid hsl(var(--border)); background:hsl(var(--muted))}
+td{padding:12px 18px; font-size:13.5px; border-bottom:1px solid hsl(var(--border));
+  color:hsl(var(--muted-foreground))}
+tbody tr:last-child td{border-bottom:0}
+tbody tr{transition:background .2s cubic-bezier(0,0,.2,1)}
+  tbody tr:hover{background:hsl(var(--secondary))}
+  tbody tr:hover td.n{color:hsl(var(--primary))}
+  td.n{transition:color .2s cubic-bezier(0,0,.2,1)}
+td.n{color:hsl(var(--foreground)); font-weight:600}
+.live{display:inline-flex; align-items:center; gap:6px; font-size:11.5px; font-weight:700;
+  color:hsl(var(--success))}
+.live i{width:5px; height:5px; border-radius:50%; background:hsl(var(--success)); display:block}
+
+/* contact */
+.contact{border:1px solid hsl(var(--border)); border-radius:var(--radius);
+  background:hsl(var(--card)); padding:40px; text-align:center}
+.contact h2{font-size:clamp(1.5rem,3vw,2rem)}
+.contact p{margin:12px auto 0; max-width:52ch; color:hsl(var(--muted-foreground))}
+.contact .acts{display:flex; gap:12px; justify-content:center; margin-top:24px; flex-wrap:wrap}
+
+footer{border-top:1px solid hsl(var(--border)); padding:28px 0; margin-top:64px}
+.frow{display:flex; justify-content:space-between; gap:16px; flex-wrap:wrap;
+  font-size:13px; color:hsl(var(--muted-foreground))}
+.frow a:hover{color:hsl(var(--foreground))}
+.flinks{display:flex; gap:18px}
+
+:focus-visible{outline:2px solid hsl(var(--ring)); outline-offset:2px; border-radius:4px}
+
+@media (max-width:820px){
+  nav{display:none}
+  .grid2,.stats{grid-template-columns:1fr}
+  .cs .row{grid-template-columns:1fr}
+}
+@media (prefers-reduced-motion:reduce){
+  *{animation:none!important; transition:none!important}
+  .rv{opacity:1; transform:none}
+}
+</style>
+
+<div id="prog"></div>
+<a class="skip" href="#main">Skip to content</a>
+
+<header>
+  <div class="wrap hrow">
+    <a class="logo" href="#">Shivam Gupta</a>
+    <nav>
+      <ul>
+        <li><a href="#about">About</a></li>
+        <li><a href="#experience">Experience</a></li>
+        <li><a href="#projects">Projects</a></li>
+        <li><a href="#case-studies">Case Studies</a></li>
+      </ul>
+    </nav>
+    <div class="hact">
+      <button class="icobtn" id="theme" aria-label="Toggle colour theme">
+        <svg class="ico-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"></path></svg>
+        <svg class="ico-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8Z"></path></svg>
+      </button>
+      <a class="btn btn-p" href="#contact">Get in Touch</a>
+    </div>
+  </div>
+</header>
+
+<main id="main">
+  <section class="hero">
+    <div class="wrap">
+      <div class="rv">
+        <span class="avail"><span class="dot"></span>Open to AI &amp; Automation roles</span>
+        <h1><span class="gx">Shivam Gupta</span></h1>
+        <p class="sub">AI &amp; Automation Engineer | LLM Workflows &amp; Full-Stack</p>
+        <p class="lede">I build production automation and internal software end to end — ten workflows
+          running live at SkillCircle, a retrieval-grounded support agent, and the Next.js and NestJS
+          platforms underneath them.</p>
+        <div class="acts">
+          <a class="btn btn-p" href="#projects">View Projects</a>
+          <a class="btn btn-o" href="#">Download Résumé</a>
+        </div>
+      </div>
+      <div class="stats rv">
+        <div class="stat"><b>10</b><span>Automations in production</span></div>
+        <div class="stat"><b>1,200+</b><span>Domains managed</span></div>
+        <div class="stat"><b>13</b><span>Branches automated</span></div>
+      </div>
+    </div>
+  </section>
+
+  <div class="strip"><ul id="strip"></ul></div>
+
+  <section id="about">
+    <div class="wrap">
+      <div class="shead rv">
+        <div class="kicker">About</div>
+        <h2>From managing infrastructure to automating it</h2>
+      </div>
+      <div class="grid2">
+        <div class="card rv">
+          <p class="mut">I joined SkillCircle in February 2025 as an IT Executive, running hosting for
+            1,200+ domains across cPanel, DNS, SSL and Linux. I began automating the repetitive parts
+            of that job; the automations became core operations, and in January 2026 the company
+            created the AI &amp; Automation Engineer role for it.</p>
+        </div>
+        <div class="card rv">
+          <p class="mut">That path shapes how I build. I write read-only dry runs and diagnostic probes
+            before anything touches production data, and keep write operations disabled until inputs
+            are verified. Automation running unattended against real student records has to be boring
+            and correct.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="experience">
+    <div class="wrap">
+      <div class="shead rv">
+        <div class="kicker">Experience</div>
+        <h2>Where I&rsquo;ve worked</h2>
+      </div>
+      <div class="tl" id="tl">
+        <div class="tl-line"><div class="tl-fill" id="tlFill"></div></div>
+        <div class="tl-parts" id="tlParts"></div>
+
+        <div class="tl-item rv-tl">
+          <div class="tl-side">
+            <article class="xcard current rv-l">
+              <span class="corner"></span>
+              <div class="xtop">
+                <div>
+                  <span class="cur-pill"><i></i>Current Role</span>
+                  <h3>AI &amp; Automation Engineer</h3>
+                  <div class="xmeta">
+                    <span class="xco">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+                      SkillCircle
+                    </span>
+                    <span class="xloc">Noida, India</span>
+                  </div>
+                </div>
+                <div class="xdate">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+                  Jan 2026 &ndash; Present
+                </div>
+              </div>
+              <div class="mchips">
+                <div class="mchip">10 workflows in production</div>
+                <div class="mchip">13 branches automated</div>
+                <div class="mchip">Zero-touch LMS onboarding</div>
+                <div class="mchip">Retrieval-grounded support agent</div>
+              </div>
+              <div class="ttags">
+                <span class="ttag">n8n</span><span class="ttag">RAG</span><span class="ttag">LLM agents</span>
+                <span class="ttag">Next.js</span><span class="ttag">NestJS</span><span class="ttag">Supabase</span>
+              </div>
+              <p class="xsum">Own AI and automation across the organisation &mdash; production workflows against live
+                 LMS, CRM and telephony systems, plus the internal platforms they feed.</p>
+              <div class="ach-h">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="7"></circle><polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"></polyline></svg>
+                <h4>Key Achievements</h4>
+              </div>
+              <div class="ach-grid">
+                <div class="ach"><b></b><span>Built a RAG support-ticket agent over the brochure corpus with structured output, so refunds and complaints escalate to a human rather than being guessed at</span></div>
+                <div class="ach"><b></b><span>Built daily sales-performance alerting joining counsellor rosters, walk-in logs and live MCube telephony data, replacing a manual nightly review</span></div>
+                <div class="ach"><b></b><span>Automated the full LMS student lifecycle across 13 branches &mdash; onboarding, archival, fee collection and certification</span></div>
+                <div class="ach"><b></b><span>Architected and shipped the job portal, admission dashboard and sales portal end to end</span></div>
+              </div>
+            </article>
+          </div>
+          <div class="tl-node n1"><span class="in">26</span></div>
+          <div class="tl-spacer"></div>
+        </div>
+
+        <div class="tl-item right rv-tl">
+          <div class="tl-side">
+            <article class="xcard rv-r">
+              <span class="corner"></span>
+              <div class="xtop">
+                <div>
+                  <h3>IT Executive</h3>
+                  <div class="xmeta">
+                    <span class="xco">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+                      SkillCircle
+                    </span>
+                    <span class="xloc">Noida, India</span>
+                  </div>
+                </div>
+                <div class="xdate">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+                  Feb 2025 &ndash; Jan 2026
+                </div>
+              </div>
+              <div class="mchips">
+                <div class="mchip">1,200+ domains managed</div>
+                <div class="mchip">First AI initiative at the company</div>
+                <div class="mchip">Uptime incidents resolved</div>
+                <div class="mchip">WHMCS &rarr; Sheets pipeline</div>
+              </div>
+              <div class="ttags">
+                <span class="ttag">cPanel / WHM</span><span class="ttag">DNS</span><span class="ttag">SSL</span>
+                <span class="ttag">BitNinja</span><span class="ttag">Linux</span>
+              </div>
+              <p class="xsum">Ran hosting infrastructure across shared and VPS Linux environments, then began
+                 automating the parts of the job that repeated.</p>
+              <div class="ach-h">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="7"></circle><polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"></polyline></svg>
+                <h4>Key Achievements</h4>
+              </div>
+              <div class="ach-grid">
+                <div class="ach"><b></b><span>Managed hosting for 1,200+ active domains, diagnosing and resolving downtime to improve uptime and reliability</span></div>
+                <div class="ach"><b></b><span>Deployed the company&rsquo;s first AI chatbot workflows &mdash; the initiative that led directly to the AI &amp; Automation Engineer role</span></div>
+                <div class="ach"><b></b><span>Automated student fee-payment reminders, removing recurring manual follow-up from operations</span></div>
+                <div class="ach"><b></b><span>Built a WHMCS to Google Sheets order pipeline making billing data available for revenue reporting</span></div>
+              </div>
+            </article>
+          </div>
+          <div class="tl-node n2"><span class="in">25</span></div>
+          <div class="tl-spacer"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="projects">
+    <div class="wrap">
+      <div class="shead rv">
+        <div class="kicker">Projects</div>
+        <h2>Selected work</h2>
+        <p>Platforms and agents built end to end — data model, interface and deployment.</p>
+      </div>
+      <div class="grid2" id="projGrid"></div>
+    </div>
+  </section>
+
+  <section id="case-studies">
+    <div class="wrap">
+      <div class="shead rv">
+        <div class="kicker">Case Studies</div>
+        <h2>How the systems work</h2>
+        <p>Two builds in more depth — the design decisions and what they changed.</p>
+      </div>
+      <div class="cs">
+        <article class="card rv">
+          <h3>Grounding a support agent so it refuses to guess</h3>
+          <p>Inbound queries hit a retrieval layer over the brochure corpus, chunked into a Qdrant
+             vector store with Gemini embeddings. The model answers only from retrieved passages and
+             emits a structured object carrying both the reply and an escalation flag; refunds,
+             complaints and account-specific issues route to a human rather than receiving an
+             invented answer. The constraint is the product — a confidently wrong reply about a
+             refund costs more than no reply at all.</p>
+          <div class="metrics">
+            <div class="metric"><b>800/80</b><span>Chunk size / overlap</span></div>
+            <div class="metric"><b>Top-8</b><span>Retrieval depth</span></div>
+            <div class="metric"><b>2-way</b><span>Reply or escalate</span></div>
+          </div>
+        </article>
+        <article class="card rv">
+          <h3>Replacing a manual daily review with targeted escalation</h3>
+          <p>Every evening the workflow joins counsellor rosters, walk-in logs and live MCube
+             telephony data, computes role-specific call targets — different for counsellors, team
+             leads and telecounsellors, adjusted down per walk-in handled — and emails only the
+             agents below target, copying their manager. What used to be a manager reading a
+             spreadsheet each night is now an exception report that arrives on its own.</p>
+          <div class="metrics">
+            <div class="metric"><b>3</b><span>Role-specific targets</span></div>
+            <div class="metric"><b>20:00</b><span>Daily IST run</span></div>
+            <div class="metric"><b>13</b><span>Branches covered</span></div>
+          </div>
+        </article>
+      </div>
+
+      <div class="shead rv" style="margin-top:56px">
+        <div class="kicker">Automations</div>
+        <h2>Running in production</h2>
+      </div>
+      <div class="tblwrap rv">
+        <div class="tscroll">
+          <table>
+            <thead><tr><th>Workflow</th><th>Trigger</th><th>Systems</th><th>Status</th></tr></thead>
+            <tbody id="opsBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="contact">
+    <div class="wrap">
+      <div class="contact rv">
+        <h2>Get in Touch</h2>
+        <p>Open to AI Engineer and AI &amp; Automation Engineer roles. Happy to walk through any of
+           the systems above, live.</p>
+        <div class="acts">
+          <a class="btn btn-p" href="#">Email me</a>
+          <a class="btn btn-o" href="#">LinkedIn</a>
+          <a class="btn btn-o" href="#">GitHub</a>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap frow">
+    <span>&copy; 2026 Shivam Gupta</span>
+    <span class="flinks"><a href="#">Email</a><a href="#">GitHub</a><a href="#">LinkedIn</a><a href="#">Résumé</a></span>
+  </div>
+</footer>
+
+<script>
+(function(){
+  var reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  /* theme toggle */
+  var root=document.documentElement, btn=document.getElementById('theme');
+  btn.addEventListener('click',function(){
+    var isDark = root.getAttribute('data-theme')==='dark' ||
+      (!root.hasAttribute('data-theme') && matchMedia('(prefers-color-scheme: dark)').matches);
+    root.setAttribute('data-theme', isDark?'light':'dark');
+  });
+
+  /* scroll progress */
+  var bar=document.getElementById('prog');
+  function prog(){
+    var h=document.documentElement.scrollHeight-innerHeight;
+    bar.style.width=(h>0?(scrollY/h)*100:0)+'%';
+  }
+  prog(); addEventListener('scroll',prog,{passive:true}); addEventListener('resize',prog,{passive:true});
+
+  /* stack strip — duplicated once for a seamless -50% loop */
+  var STACK=['n8n','OpenAI','Gemini','Qdrant','LangChain','TypeScript','Next.js','NestJS',
+    'Supabase','PostgreSQL','Redis / BullMQ','Docker','Linux','cPanel / WHM','Cloudflare','REST APIs'];
+  var strip=document.getElementById('strip');
+  for(var p=0;p<2;p++){ STACK.forEach(function(s){
+    var li=document.createElement('li'); li.textContent=s; strip.appendChild(li); }); }
+
+  /* projects */
+  var PROJECTS=[
+    {t:'SkillCircle Job Portal',
+     d:'A three-sided marketplace connecting students, employers and placement coordinators. Students build profiles and apply, employers post roles and search candidates, coordinators verify users and record placements.',
+     k:['Next.js 14','NestJS 10','Supabase','BullMQ','Resend'], l:'job.skillcircle.in'},
+    {t:'RAG Support Agent',
+     d:'Retrieval-grounded ticket resolution over the brochure corpus, with structured output and an explicit escalation path to a human for refunds, complaints and account issues.',
+     k:['Qdrant','Gemini','n8n','LangChain'], l:null},
+    {t:'Admission Dashboard',
+     d:'Replaced a single Google Form with a role-based admissions platform — student self-verification, an admin approval gate and SLA timers on the 24h / 48h / 3-day rules, across 30+ migrations.',
+     k:['Next.js','Supabase','PostgreSQL'], l:null},
+    {t:'Sales Manager Portal',
+     d:'Multi-branch sales dashboard with counsellor-level drill-down, pulling from Google Sheets and the Meritto CRM behind a JWT-authenticated API.',
+     k:['React','Express','Sheets API','Meritto CRM'], l:null}
+  ];
+  var pg=document.getElementById('projGrid');
+  PROJECTS.forEach(function(p){
+    var a=document.createElement('article'); a.className='card proj rv';
+    var h=document.createElement('h3'); h.textContent=p.t;
+    var d=document.createElement('p'); d.textContent=p.d;
+    var t=document.createElement('div'); t.className='tags';
+    p.k.forEach(function(k){ var s=document.createElement('span'); s.className='tag'; s.textContent=k; t.appendChild(s); });
+    a.appendChild(h); a.appendChild(d); a.appendChild(t);
+    if(p.l){ var lk=document.createElement('a'); lk.className='plink'; lk.href='#';
+      lk.innerHTML=''; lk.appendChild(document.createTextNode(p.l+' ')); var ar=document.createElement('span'); ar.className='arw'; ar.textContent='→'; lk.appendChild(ar); a.appendChild(lk); }
+    pg.appendChild(a);
+  });
+
+  /* automations table */
+  var OPS=[
+    ['LMS Student Onboarding','Daily','Edmingle · Sheets'],
+    ['LMS Archive / Unarchive','Daily','Edmingle · Sheets'],
+    ['MCube Defaulter Alert','Daily 20:00 IST','MCube API · Sheets · Gmail'],
+    ['Masterclass Certificates','Real-time','Slides · Drive · Gmail'],
+    ['Fee Reminder Emails','Daily','Sheets · Gmail'],
+    ['Canva Seat Gatekeeper','Form submit','Sheets · Gmail'],
+    ['LinkedIn Extension Receiver','Webhook','Chrome ext · Sheets'],
+    ['PandaHost Shutdown Reminder','Every 3 days','Sheets · Gmail']
+  ];
+  var tb=document.getElementById('opsBody');
+  OPS.forEach(function(r){
+    var tr=document.createElement('tr');
+    var a=document.createElement('td'); a.className='n'; a.textContent=r[0];
+    var b=document.createElement('td'); b.textContent=r[1];
+    var c=document.createElement('td'); c.textContent=r[2];
+    var d=document.createElement('td'); d.innerHTML='<span class="live"><i></i>LIVE</span>';
+    tr.appendChild(a); tr.appendChild(b); tr.appendChild(c); tr.appendChild(d);
+    tb.appendChild(tr);
+  });
+
+  /* timeline: drifting particles */
+  var parts=document.getElementById('tlParts');
+  if(parts){
+    for(var i=0;i<12;i++){
+      var s=document.createElement('i');
+      s.style.left=(8+Math.random()*84).toFixed(2)+'%';
+      s.style.top=(4+Math.random()*92).toFixed(2)+'%';
+      s.style.animationDelay=(Math.random()*9).toFixed(2)+'s';
+      parts.appendChild(s);
+    }
+  }
+
+  /* timeline: scroll-driven gradient fill (his scaleY(0) -> 1) */
+  var tl=document.getElementById('tl'), fill=document.getElementById('tlFill');
+  if(tl&&fill){
+    function fillProg(){
+      var r=tl.getBoundingClientRect();
+      var start=innerHeight*0.85, end=innerHeight*0.15;
+      var p=(start-r.top)/(r.height+(start-end));
+      fill.style.transform='scaleY('+Math.max(0,Math.min(1,p))+')';
+    }
+    if(reduce){ fill.style.transform='scaleY(1)'; }
+    else{ fillProg(); addEventListener('scroll',fillProg,{passive:true});
+          addEventListener('resize',fillProg,{passive:true}); }
+  }
+
+  /* reveals — includes the timeline row / card / achievement variants */
+  var SEL='.rv,.rv-tl,.rv-l,.rv-r';
+  var els=[].slice.call(document.querySelectorAll(SEL));
+  var achs=[].slice.call(document.querySelectorAll('.ach'));
+  if(reduce){
+    els.forEach(function(e){e.classList.add('in');});
+    achs.forEach(function(a){a.style.opacity=1;});
+    return;
+  }
+  achs.forEach(function(a){ a.style.opacity=0; a.style.transform='translateX(-20px)';
+    a.style.transition='opacity .5s cubic-bezier(0,0,.2,1),transform .5s cubic-bezier(0,0,.2,1)'; });
+  var io=new IntersectionObserver(function(entries){
+    entries.forEach(function(e){
+      if(!e.isIntersecting) return;
+      var sibs=[].slice.call(e.target.parentNode.children).filter(function(n){
+        return n.className && String(n.className).match(/\brv(-tl|-l|-r)?\b/); });
+      e.target.style.transitionDelay=(Math.max(0,sibs.indexOf(e.target))*60)+'ms';
+      e.target.classList.add('in');
+      /* stagger this card's achievements in behind it */
+      var rows=e.target.querySelectorAll('.ach');
+      Array.prototype.forEach.call(rows,function(a,i){
+        a.style.transitionDelay=(180+i*90)+'ms';
+        a.style.opacity=1; a.style.transform='none';
+      });
+      io.unobserve(e.target);
+    });
+  },{threshold:.1,rootMargin:'0px 0px -6% 0px'});
+  els.forEach(function(e){io.observe(e);});
+})();
+</script>
