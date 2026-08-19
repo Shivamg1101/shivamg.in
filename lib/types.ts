@@ -44,6 +44,9 @@ export type Project = {
   cover_url: string | null;
   highlight: string | null;
   features: string[];
+  category: string | null;
+  role: string | null;
+  metrics: string[];
   kind: ProjectKind;
   featured: boolean;
   published: boolean;
@@ -91,4 +94,10 @@ export function formatRange(start: string, end: string | null, isCurrent: boolea
   const fmt = (d: string) =>
     new Date(d).toLocaleDateString("en-GB", { month: "short", year: "numeric" });
   return `${fmt(start)} – ${isCurrent || !end ? "Present" : fmt(end)}`;
+}
+
+/** Metric tiles are stored as "value | label"; split them for rendering. */
+export function parseMetric(raw: string): { value: string; label: string } {
+  const [value, ...rest] = raw.split("|");
+  return { value: value.trim(), label: rest.join("|").trim() };
 }
