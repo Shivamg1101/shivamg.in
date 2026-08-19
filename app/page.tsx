@@ -58,7 +58,7 @@ export default async function Home() {
         {stack.length > 0 && <StackMarquee items={stack} />}
 
         <section id="about" className="scroll-mt-20 py-18">
-          <div className="mx-auto max-w-5xl px-6">
+          <div className="mx-auto max-w-6xl px-6">
             <SectionHead kicker="About" title="From managing infrastructure to automating it" />
             <div className="grid gap-4 md:grid-cols-2">
               {profile.bio.map((para, i) => (
@@ -73,14 +73,14 @@ export default async function Home() {
         </section>
 
         <section id="experience" className="scroll-mt-20 py-18">
-          <div className="mx-auto max-w-5xl px-6">
+          <div className="mx-auto max-w-6xl px-6">
             <SectionHead kicker="Experience" title="Where I've worked" />
             <Timeline items={experience} />
           </div>
         </section>
 
         <section id="projects" className="scroll-mt-20 py-18">
-          <div className="mx-auto max-w-5xl px-6">
+          <div className="mx-auto max-w-6xl px-6">
             <SectionHead
               kicker="Projects"
               title="Selected work"
@@ -97,7 +97,7 @@ export default async function Home() {
         </section>
 
         <section id="case-studies" className="scroll-mt-20 py-18">
-          <div className="mx-auto max-w-5xl px-6">
+          <div className="mx-auto max-w-6xl px-6">
             <SectionHead
               kicker="Case Studies"
               title="How the systems work"
@@ -139,7 +139,7 @@ export default async function Home() {
         </section>
 
         <section id="contact" className="scroll-mt-20 py-18">
-          <div className="mx-auto max-w-5xl px-6">
+          <div className="mx-auto max-w-6xl px-6">
             <Reveal className="rounded-md border border-border bg-card p-10 text-center">
               <h2 className="text-2xl font-bold sm:text-3xl">Get in Touch</h2>
               <p className="mx-auto mt-3 max-w-[52ch] text-muted-foreground">

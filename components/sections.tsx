@@ -23,7 +23,7 @@ export function SectionHead({
 export function Hero({ profile, stats }: { profile: Profile; stats: { value: string; label: string }[] }) {
   return (
     <section className="pb-16 pt-20">
-      <div className="mx-auto max-w-5xl px-6">
+      <div className="mx-auto max-w-6xl px-6">
         <Reveal>
           {profile.available && (
             <span className="inline-flex items-center gap-2 rounded-full border border-primary/20 bg-accent px-3 py-1.5 text-[13px] font-medium text-accent-foreground">
@@ -192,7 +192,7 @@ export function Footer({ profile }: { profile: Profile }) {
 
   return (
     <footer className="mt-16 border-t border-border py-7">
-      <div className="mx-auto flex max-w-5xl flex-wrap justify-between gap-4 px-6 text-[13px] text-muted-foreground">
+      <div className="mx-auto flex max-w-6xl flex-wrap justify-between gap-4 px-6 text-[13px] text-muted-foreground">
         <span>© {new Date().getFullYear()} {profile.name}</span>
         <span className="flex gap-5">
           {links.map((l) => (
