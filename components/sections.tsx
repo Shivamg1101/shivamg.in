@@ -1,4 +1,3 @@
-import Link from "next/link";
 import { Reveal } from "@/components/motion";
 import type { Automation, Profile, Project } from "@/lib/types";
 
@@ -20,52 +19,11 @@ export function SectionHead({
   );
 }
 
-export function Hero({ profile, stats }: { profile: Profile; stats: { value: string; label: string }[] }) {
+export function Stats({ stats }: { stats: { value: string; label: string }[] }) {
   return (
-    <section className="pb-16 pt-20">
+    <section className="py-14">
       <div className="mx-auto max-w-6xl px-6">
-        <Reveal>
-          {profile.available && (
-            <span className="inline-flex items-center gap-2 rounded-full border border-primary/20 bg-accent px-3 py-1.5 text-[13px] font-medium text-accent-foreground">
-              <span className="relative flex h-[7px] w-[7px]">
-                <span className="animate-ping-slow absolute inline-flex h-full w-full rounded-full bg-success" />
-                <span className="relative inline-flex h-[7px] w-[7px] rounded-full bg-success" />
-              </span>
-              {profile.available_text}
-            </span>
-          )}
-
-          <h1 className="mt-5 text-4xl font-extrabold sm:text-5xl lg:text-[3.4rem]">
-            <span className="animate-gradient-x bg-gradient-to-r from-foreground via-primary to-foreground bg-clip-text text-transparent">
-              {profile.name}
-            </span>
-          </h1>
-
-          <p className="mt-3 text-lg font-semibold text-primary sm:text-xl">{profile.headline}</p>
-
-          {profile.tagline && (
-            <p className="mt-4 max-w-[60ch] text-[1.03rem] text-muted-foreground">{profile.tagline}</p>
-          )}
-
-          <div className="mt-7 flex flex-wrap gap-3">
-            <Link
-              href="#projects"
-              className="rounded-md bg-primary px-4 py-2.5 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary/90"
-            >
-              View Projects
-            </Link>
-            {profile.resume_url && (
-              <a
-                href={profile.resume_url}
-                className="rounded-md border border-border px-4 py-2.5 text-sm font-semibold transition-colors hover:bg-secondary"
-              >
-                Download Résumé
-              </a>
-            )}
-          </div>
-        </Reveal>
-
-        <Reveal delay={0.1} className="mt-11 grid gap-4 sm:grid-cols-3">
+        <Reveal className="grid gap-4 sm:grid-cols-3">
           {stats.map((s) => (
             <div
               key={s.label}

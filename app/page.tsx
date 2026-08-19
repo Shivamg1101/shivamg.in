@@ -2,10 +2,11 @@ import { Header } from "@/components/header";
 import { ContactForm } from "@/components/contact-form";
 import { ScrollProgress, Reveal } from "@/components/motion";
 import { Timeline } from "@/components/timeline";
+import { Hero } from "@/components/hero";
 import {
   AutomationsTable,
   Footer,
-  Hero,
+  Stats,
   ProjectCard,
   SectionHead,
   StackMarquee,
@@ -53,7 +54,9 @@ export default async function Home() {
       <Header name={profile.name} />
 
       <main id="main">
-        <Hero profile={profile} stats={stats} />
+        <Hero profile={profile} />
+
+        <Stats stats={stats} />
 
         {stack.length > 0 && <StackMarquee items={stack} />}
 
