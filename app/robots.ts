@@ -13,6 +13,8 @@ export default function robots(): MetadataRoute.Robots {
       },
     ],
     sitemap: `${SITE_URL}/sitemap.xml`,
+    // llms.txt is a proposed convention; harmless if ignored.
+    // Referenced here so crawlers that do look for it can find it.
     host: SITE_URL,
   };
 }

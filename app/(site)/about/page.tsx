@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
 import { pageMeta } from "@/lib/site";
 import Link from "next/link";
-import { BreadcrumbSchema } from "@/components/structured-data";
+import { BreadcrumbSchema, FaqSchema } from "@/components/structured-data";
+import { FAQS, FaqSection } from "@/components/faq";
 import { Reveal } from "@/components/motion";
 import { ProfileTabs, SkillMatrix, type SkillGroup, type Tab } from "@/components/about-widgets";
 import { getAutomations, getProfile, getProjects } from "@/lib/queries";
@@ -199,6 +200,7 @@ export default async function AboutPage() {
   return (
     <>
       <BreadcrumbSchema trail={[{ name: "About", path: "/about" }]} />
+      <FaqSchema faqs={FAQS} />
       {/* ---------------- hero ---------------- */}
       <section className="relative overflow-hidden bg-background pb-14 pt-16 dark:bg-black">
         <div aria-hidden className="absolute -left-40 -top-40 h-80 w-80 rounded-full bg-primary/5 blur-3xl" />
@@ -495,6 +497,8 @@ export default async function AboutPage() {
           </div>
         </div>
       </section>
+
+      <FaqSection />
 
       {/* ---------------- cta ---------------- */}
       <section className="border-t border-border py-16">
