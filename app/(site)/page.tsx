@@ -10,6 +10,7 @@ export const revalidate = 60;
 
 export const metadata: Metadata = {
   alternates: { canonical: "/" },
+  openGraph: { url: "/", type: "website" },
   title: "Shivam Gupta | AI & Automation Engineer",
   description:
     "Ten automations running in production, a retrieval-grounded support agent, and the full-stack platforms underneath them.",

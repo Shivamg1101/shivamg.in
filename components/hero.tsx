@@ -230,7 +230,7 @@ export function Hero({ profile }: { profile: Profile }) {
 
         <div className="relative z-10 mx-auto flex w-full max-w-7xl flex-1 flex-col items-center justify-center px-4 text-center sm:px-6 lg:px-8">
           {/* typewriter greeting */}
-          <motion.div
+          <motion.h1
             {...rise}
             className="mb-6 flex min-h-[1.2em] w-full items-center justify-center text-4xl font-bold sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl"
           >
@@ -240,7 +240,12 @@ export function Hero({ profile }: { profile: Profile }) {
               <span>{greeting}</span>
               <span className="ml-1 inline-block h-[0.8em] w-0.5 translate-y-[0.06em] animate-pulse bg-primary align-middle" />
             </div>
-          </motion.div>
+            {/* The visible heading cycles languages, so give crawlers and
+                screen readers one stable, descriptive phrase. */}
+            <span className="sr-only">
+              {profile.name} — {profile.headline}
+            </span>
+          </motion.h1>
 
           {/* headline */}
           <motion.div
