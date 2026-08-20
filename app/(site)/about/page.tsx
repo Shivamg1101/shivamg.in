@@ -9,7 +9,8 @@ export const revalidate = 60;
 
 export const metadata: Metadata = {
   alternates: { canonical: "/about" },
-  title: "About | Shivam Gupta",
+  openGraph: { url: "/about", type: "website" },
+  title: "About Shivam Gupta | AI & Automation Engineer",
   description:
     "How I moved from running hosting infrastructure for 1,200+ domains to owning AI and automation — the approach, the stack, and what I optimise for.",
 };

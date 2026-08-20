@@ -9,7 +9,8 @@ export const revalidate = 60;
 
 export const metadata: Metadata = {
   alternates: { canonical: "/projects" },
-  title: "Projects | Shivam Gupta",
+  openGraph: { url: "/projects", type: "website" },
+  title: "AI & Automation Projects | Shivam Gupta",
   description:
     "Production automation, retrieval-grounded agents and full-stack platforms — built end to end, from data model to deployment.",
 };

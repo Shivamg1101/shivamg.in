@@ -8,7 +8,8 @@ export const revalidate = 60;
 
 export const metadata: Metadata = {
   alternates: { canonical: "/case-studies" },
-  title: "Case Studies | Shivam Gupta",
+  openGraph: { url: "/case-studies", type: "website" },
+  title: "Case Studies: RAG & Workflow Automation | Shivam Gupta",
   description:
     "Architecture deep dives — how the retrieval-grounded support agent and the nightly sales alerting actually work.",
 };
