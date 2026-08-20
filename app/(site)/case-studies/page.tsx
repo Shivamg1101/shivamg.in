@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { pageMeta } from "@/lib/site";
 import { BreadcrumbSchema, ProjectsSchema } from "@/components/structured-data";
 import { Reveal } from "@/components/motion";
 import { CaseStudyCard } from "@/components/case-study-card";
@@ -6,13 +7,12 @@ import { getProjects } from "@/lib/queries";
 
 export const revalidate = 60;
 
-export const metadata: Metadata = {
-  alternates: { canonical: "/case-studies" },
-  openGraph: { url: "/case-studies", type: "website" },
+export const metadata: Metadata = pageMeta({
   title: "Case Studies: RAG & Workflow Automation | Shivam Gupta",
   description:
     "Architecture deep dives — how the retrieval-grounded support agent and the nightly sales alerting actually work.",
-};
+  path: "/case-studies",
+});
 
 export default async function CaseStudiesPage() {
   const studies = await getProjects("case-study");
