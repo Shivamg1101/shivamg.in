@@ -1,5 +1,6 @@
 import { SITE_NAME, SITE_URL } from "@/lib/site";
 import type { Experience, Profile, Project } from "@/lib/types";
+import type { QA } from "@/components/faq";
 
 /**
  * JSON-LD is emitted server-side from database content, so the graph never
@@ -138,6 +139,22 @@ export function ExperienceSchema({ items }: { items: Experience[] }) {
             description: x.summary ?? undefined,
             memberOf: { "@type": "Organization", name: x.company },
           },
+        })),
+      }}
+    />
+  );
+}
+
+export function FaqSchema({ faqs }: { faqs: QA[] }) {
+  return (
+    <Ld
+      data={{
+        "@context": "https://schema.org",
+        "@type": "FAQPage",
+        mainEntity: faqs.map((f) => ({
+          "@type": "Question",
+          name: f.q,
+          acceptedAnswer: { "@type": "Answer", text: f.a },
         })),
       }}
     />
