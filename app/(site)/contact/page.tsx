@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { pageMeta } from "@/lib/site";
 import { ContactForm } from "@/components/contact-form";
 import { BreadcrumbSchema } from "@/components/structured-data";
 import { Reveal } from "@/components/motion";
@@ -7,12 +8,12 @@ import { getProfile } from "@/lib/queries";
 
 export const revalidate = 60;
 
-export const metadata: Metadata = {
-  alternates: { canonical: "/contact" },
-  openGraph: { url: "/contact", type: "website" },
+export const metadata: Metadata = pageMeta({
   title: "Contact Shivam Gupta | AI & Automation Engineer",
-  description: "Open to AI Engineer and AI & Automation Engineer roles.",
-};
+  description:
+    "Open to AI Engineer and AI & Automation Engineer roles.",
+  path: "/contact",
+});
 
 export default async function ContactPage() {
   const profile = await getProfile();

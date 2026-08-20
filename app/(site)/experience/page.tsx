@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { pageMeta } from "@/lib/site";
 import { BreadcrumbSchema, ExperienceSchema } from "@/components/structured-data";
 import { Reveal } from "@/components/motion";
 import { Timeline } from "@/components/timeline";
@@ -6,13 +7,12 @@ import { getAutomations, getExperience } from "@/lib/queries";
 
 export const revalidate = 60;
 
-export const metadata: Metadata = {
-  alternates: { canonical: "/experience" },
-  openGraph: { url: "/experience", type: "website" },
+export const metadata: Metadata = pageMeta({
   title: "Experience | Shivam Gupta, AI & Automation Engineer",
   description:
     "Automation, AI and infrastructure roles — what each one shipped, and the metrics behind them.",
-};
+  path: "/experience",
+});
 
 const TrendUp = () => (
   <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-primary" aria-hidden>

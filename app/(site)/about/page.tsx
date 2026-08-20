@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { pageMeta } from "@/lib/site";
 import Link from "next/link";
 import { BreadcrumbSchema } from "@/components/structured-data";
 import { Reveal } from "@/components/motion";
@@ -7,13 +8,12 @@ import { getAutomations, getProfile, getProjects } from "@/lib/queries";
 
 export const revalidate = 60;
 
-export const metadata: Metadata = {
-  alternates: { canonical: "/about" },
-  openGraph: { url: "/about", type: "website" },
+export const metadata: Metadata = pageMeta({
   title: "About Shivam Gupta | AI & Automation Engineer",
   description:
     "How I moved from running hosting infrastructure for 1,200+ domains to owning AI and automation — the approach, the stack, and what I optimise for.",
-};
+  path: "/about",
+});
 
 const TABS: Tab[] = [
   {

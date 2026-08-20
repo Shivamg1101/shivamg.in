@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { pageMeta } from "@/lib/site";
 import { BreadcrumbSchema, ProjectsSchema } from "@/components/structured-data";
 import { Reveal } from "@/components/motion";
 import { ProjectCard } from "@/components/project-card";
@@ -7,13 +8,12 @@ import { getAutomations, getProjects } from "@/lib/queries";
 
 export const revalidate = 60;
 
-export const metadata: Metadata = {
-  alternates: { canonical: "/projects" },
-  openGraph: { url: "/projects", type: "website" },
+export const metadata: Metadata = pageMeta({
   title: "AI & Automation Projects | Shivam Gupta",
   description:
     "Production automation, retrieval-grounded agents and full-stack platforms — built end to end, from data model to deployment.",
-};
+  path: "/projects",
+});
 
 export default async function ProjectsPage() {
   const [projects, automations] = await Promise.all([getProjects(), getAutomations()]);

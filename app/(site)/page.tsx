@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { pageMeta } from "@/lib/site";
 import { ProjectsSchema } from "@/components/structured-data";
 import { Hero } from "@/components/hero";
 import { Bento } from "@/components/bento";
@@ -8,13 +9,12 @@ import { getAutomations, getProfile, getProjects } from "@/lib/queries";
 
 export const revalidate = 60;
 
-export const metadata: Metadata = {
-  alternates: { canonical: "/" },
-  openGraph: { url: "/", type: "website" },
+export const metadata: Metadata = pageMeta({
   title: "Shivam Gupta | AI & Automation Engineer",
   description:
     "Ten automations running in production, a retrieval-grounded support agent, and the full-stack platforms underneath them.",
-};
+  path: "/",
+});
 
 export default async function Home() {
   const [profile, projects, automations] = await Promise.all([
