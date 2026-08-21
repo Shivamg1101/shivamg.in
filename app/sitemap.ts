@@ -18,6 +18,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${SITE_URL}/experience`, changeFrequency: "monthly", priority: 0.8, lastModified: updated },
     { url: `${SITE_URL}/projects`, changeFrequency: "weekly", priority: 0.9, lastModified: updated },
     { url: `${SITE_URL}/case-studies`, changeFrequency: "weekly", priority: 0.9, lastModified: updated },
+    { url: `${SITE_URL}/blog`, changeFrequency: "weekly", priority: 0.8, lastModified: updated },
     { url: `${SITE_URL}/contact`, changeFrequency: "yearly", priority: 0.5, lastModified: updated },
   ];
 
@@ -34,7 +35,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   // Write-ups become real URLs as soon as any are published.
   for (const p of posts.filter((x) => x.published)) {
     routes.push({
-      url: `${SITE_URL}/writing/${p.slug}`,
+      url: `${SITE_URL}/blog/${p.slug}`,
       changeFrequency: "yearly",
       priority: 0.7,
       lastModified: new Date(p.updated_at),
