@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { motion, useReducedMotion } from "framer-motion";
 import { parseMetric, type Project } from "@/lib/types";
 
@@ -100,13 +101,21 @@ export function CaseStudyCard({ project, index }: { project: Project; index: num
         )}
 
         {project.body && (
-          <p className="mb-5 border-l-2 border-primary/25 pl-4 text-[13px] leading-relaxed text-muted-foreground">
+          /* Preview only — the full write-up lives on the detail page, so this
+             stays clamped however long the body grows. */
+          <p className="mb-5 line-clamp-4 border-l-2 border-primary/25 pl-4 text-[13px] leading-relaxed text-muted-foreground">
             {project.body}
           </p>
         )}
 
         <div className="mt-auto flex items-center justify-between border-t border-border/40 pt-4">
-          <span className="text-sm font-semibold">Read case study</span>
+          <Link
+            href={`/case-studies/${project.slug}`}
+            className="text-sm font-semibold after:absolute after:inset-0 hover:text-primary"
+          >
+            Read case study
+            <span className="sr-only"> — {project.title}</span>
+          </Link>
           <Arrow />
         </div>
       </div>
