@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
+import { Resend } from "resend";
 import crypto from "crypto";
 
 /**
@@ -21,6 +22,75 @@ const LIMITS = { title: 200, excerpt: 400, body: 60_000, tag: 40, tags: 8 };
 const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL!;
 const SERVICE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
 const INGEST_TOKEN = process.env.POST_INGEST_TOKEN;
+const SITE = process.env.NEXT_PUBLIC_SITE_URL ?? "https://shivamg.in";
+
+function escapeHtml(s: string) {
+  return s
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;");
+}
+
+/**
+ * Tell the author a draft is waiting. Sent from our own domain via Resend so the
+ * pipeline has no dependency on any third-party mailbox.
+ *
+ * Never throws: the draft is already saved by the time this runs, and losing a
+ * notification is much cheaper than losing the post.
+ */
+async function notify(post: {
+  title: string;
+  excerpt: string | null;
+  slug: string;
+  tags: string[];
+  words: number;
+}) {
+  const key = process.env.RESEND_API_KEY;
+  const to = process.env.DRAFT_TO_EMAIL ?? process.env.CONTACT_TO_EMAIL;
+  if (!key || !to) return false;
+
+  const from = process.env.CONTACT_FROM_EMAIL ?? "Portfolio <contact@shivamg.in>";
+  const review = `${SITE}/admin/posts`;
+  const tagLine = post.tags.length ? post.tags.join(", ") : "none";
+
+  try {
+    await new Resend(key).emails.send({
+      from,
+      to,
+      subject: `Draft ready — ${post.title}`,
+      text:
+        `A new draft is waiting in your CMS.\n\n` +
+        `${post.title}\n${post.excerpt ?? ""}\n\n` +
+        `${post.words} words · ${Math.max(1, Math.round(post.words / 225))} min read\n` +
+        `Tags: ${tagLine}\nSlug: ${post.slug}\n\n` +
+        `Review and publish: ${review}\n\n` +
+        `It stays unpublished until you flip the Published toggle.`,
+      html: `
+        <div style="font-family:ui-sans-serif,system-ui,sans-serif;line-height:1.6;color:#171717">
+          <p style="margin:0 0 18px;font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:#7c3aed;font-weight:700">
+            Draft ready for review
+          </p>
+          <h1 style="margin:0 0 10px;font-size:20px;line-height:1.35">${escapeHtml(post.title)}</h1>
+          ${post.excerpt ? `<p style="margin:0 0 18px;color:#525252">${escapeHtml(post.excerpt)}</p>` : ""}
+          <p style="margin:0 0 22px;font-size:13px;color:#737373">
+            ${post.words} words · ${Math.max(1, Math.round(post.words / 225))} min read<br>
+            Tags: ${escapeHtml(tagLine)}
+          </p>
+          <a href="${review}" style="display:inline-block;background:#7c3aed;color:#fff;text-decoration:none;padding:11px 22px;border-radius:999px;font-weight:600;font-size:14px">
+            Review and publish
+          </a>
+          <p style="margin:22px 0 0;font-size:12px;color:#737373">
+            Nothing is public until you flip the Published toggle in the CMS.
+          </p>
+        </div>`,
+    });
+    return true;
+  } catch (e) {
+    console.error("[posts] notification failed:", e instanceof Error ? e.message : e);
+    return false;
+  }
+}
 
 function authorised(header: string | null): boolean {
   if (!INGEST_TOKEN || !header) return false;
@@ -121,12 +191,17 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Could not save the draft." }, { status: 500 });
   }
 
+  const words = text.split(/\s+/).filter(Boolean).length;
+  const notified = await notify({ title, excerpt: excerpt || null, slug, tags, words });
+
   return NextResponse.json({
     ok: true,
     id: data.id,
     slug: data.slug,
     status: "draft",
-    review_url: `${process.env.NEXT_PUBLIC_SITE_URL ?? "https://shivamg.in"}/admin/posts`,
+    words,
+    notified,
+    review_url: `${SITE}/admin/posts`,
   });
 }
 
