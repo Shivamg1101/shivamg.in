@@ -12,6 +12,7 @@ const NAV = [
   { label: "Experience", href: "/experience" },
   { label: "Projects", href: "/projects" },
   { label: "Case Studies", href: "/case-studies" },
+  { label: "Blog", href: "/blog" },
 ];
 
 /** Subscribes to the class the pre-paint script sets, so no state is
