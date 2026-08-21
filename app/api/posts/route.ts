@@ -39,15 +39,20 @@ function escapeHtml(s: string) {
  * Never throws: the draft is already saved by the time this runs, and losing a
  * notification is much cheaper than losing the post.
  */
-async function notify(post: {
-  title: string;
-  excerpt: string | null;
-  slug: string;
-  tags: string[];
-  words: number;
-}) {
+async function notify(
+  post: {
+    title: string;
+    excerpt: string | null;
+    slug: string;
+    tags: string[];
+    words: number;
+  },
+  fallbackTo: string | null
+) {
   const key = process.env.RESEND_API_KEY;
-  const to = process.env.DRAFT_TO_EMAIL ?? process.env.CONTACT_TO_EMAIL;
+  // Env override first, then the address on the profile row — so this works
+  // with no extra configuration.
+  const to = process.env.DRAFT_TO_EMAIL ?? process.env.CONTACT_TO_EMAIL ?? fallbackTo;
   if (!key || !to) return false;
 
   const from = process.env.CONTACT_FROM_EMAIL ?? "Portfolio <contact@shivamg.in>";
@@ -192,7 +197,17 @@ export async function POST(request: Request) {
   }
 
   const words = text.split(/\s+/).filter(Boolean).length;
-  const notified = await notify({ title, excerpt: excerpt || null, slug, tags, words });
+
+  const { data: profile } = await supabase
+    .from("profile")
+    .select("email")
+    .eq("id", 1)
+    .maybeSingle();
+
+  const notified = await notify(
+    { title, excerpt: excerpt || null, slug, tags, words },
+    profile?.email ?? null
+  );
 
   return NextResponse.json({
     ok: true,
