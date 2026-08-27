@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { pageMeta, SITE_URL } from "@/lib/site";
@@ -25,11 +26,23 @@ export async function generateMetadata({
     });
   }
 
-  return pageMeta({
+  const meta = pageMeta({
     title: `${post.title} | Shivam Gupta`,
     description: post.excerpt ?? post.body.slice(0, 155).replace(/\s+\S*$/, "") + "…",
     path: `/blog/${post.slug}`,
   });
+
+  // A cover image doubles as the social preview card. Without this the post
+  // shares with the generic site-wide OG image, which is a wasted impression.
+  if (post.cover_url) {
+    meta.openGraph = {
+      ...meta.openGraph,
+      images: [{ url: post.cover_url, width: 1200, height: 630, alt: post.title }],
+    };
+    meta.twitter = { ...meta.twitter, images: [post.cover_url] };
+  }
+
+  return meta;
 }
 
 /**
@@ -145,6 +158,22 @@ export default async function BlogPostPage({
               </ul>
             )}
           </Reveal>
+
+          {post.cover_url && (
+            <Reveal delay={0.05}>
+              {/* Explicit dimensions so the image reserves its space before it
+                  loads. Without them the text below jumps when it arrives,
+                  which counts against Cumulative Layout Shift. */}
+              <Image
+                src={post.cover_url}
+                alt=""
+                width={1200}
+                height={630}
+                priority
+                className="mt-8 aspect-[1200/630] w-full rounded-2xl border border-border object-cover"
+              />
+            </Reveal>
+          )}
 
           <Reveal delay={0.08}>
             <div className="mt-10 border-t border-border pt-10">

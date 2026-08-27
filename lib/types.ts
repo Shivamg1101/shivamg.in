@@ -73,6 +73,7 @@ export type Post = {
   title: string;
   excerpt: string | null;
   body: string;
+  cover_url: string | null;
   tags: string[];
   published: boolean;
   published_at: string | null;

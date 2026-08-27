@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { createClient } from "@supabase/supabase-js";
+import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 import { Resend } from "resend";
 import crypto from "crypto";
 
@@ -18,6 +18,114 @@ import crypto from "crypto";
  */
 
 const LIMITS = { title: 200, excerpt: 400, body: 60_000, tag: 40, tags: 8 };
+const COVER = { maxBytes: 10 * 1024 * 1024, timeoutMs: 15_000 };
+
+const COVER_BUCKET = "blog-covers";
+
+/**
+ * Fetching a caller-supplied URL server-side is an SSRF primitive, so the URL
+ * is constrained before we touch it:
+ *
+ *  - https only, so file:// and http:// to a plaintext internal service are out.
+ *  - No credentials in the URL.
+ *  - Hostname must not be localhost or a literal private/link-local address —
+ *    including the cloud metadata endpoint at 169.254.169.254, which is the
+ *    classic target.
+ *
+ * The remaining gap is a public hostname that resolves to a private address.
+ * Closing that needs DNS resolution plus a pinned-IP fetch, which is more
+ * machinery than this is worth: the endpoint is already behind a bearer token,
+ * and the only thing an attacker could learn is whether an internal host serves
+ * something image-shaped.
+ */
+function safeImageUrl(raw: string): URL | null {
+  let u: URL;
+  try {
+    u = new URL(raw);
+  } catch {
+    return null;
+  }
+
+  if (u.protocol !== "https:") return null;
+  if (u.username || u.password) return null;
+
+  const host = u.hostname.toLowerCase();
+  if (host === "localhost" || host.endsWith(".localhost") || host === "[::1]") return null;
+
+  // Literal IPv4 in a private, loopback, link-local or CGNAT range.
+  const v4 = host.match(/^(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})$/);
+  if (v4) {
+    const [a, b] = [Number(v4[1]), Number(v4[2])];
+    if (a === 10 || a === 127 || a === 0) return null;
+    if (a === 172 && b >= 16 && b <= 31) return null;
+    if (a === 192 && b === 168) return null;
+    if (a === 169 && b === 254) return null; // cloud metadata
+    if (a === 100 && b >= 64 && b <= 127) return null;
+  }
+  if (host.startsWith("[")) return null; // bare IPv6 literal
+
+  return u;
+}
+
+/**
+ * Download a cover image and re-host it, returning a permanent public URL.
+ *
+ * Source URLs from Notion are signed and expire in about an hour, so storing
+ * one directly would produce a post that looks right today and shows a broken
+ * image next week. Never throws: a missing cover is much cheaper than a lost
+ * post, so failure returns null and the post is created without one.
+ */
+async function rehostCover(
+  rawUrl: string,
+  slug: string,
+  supabase: SupabaseClient
+): Promise<string | null> {
+  const url = safeImageUrl(rawUrl);
+  if (!url) {
+    console.warn("[posts] cover rejected: unsafe or malformed URL");
+    return null;
+  }
+
+  try {
+    const res = await fetch(url, {
+      redirect: "follow",
+      signal: AbortSignal.timeout(COVER.timeoutMs),
+    });
+    if (!res.ok) {
+      console.warn(`[posts] cover fetch failed: HTTP ${res.status}`);
+      return null;
+    }
+
+    const type = (res.headers.get("content-type") ?? "").split(";")[0].trim().toLowerCase();
+    const ext = { "image/jpeg": "jpg", "image/png": "png", "image/webp": "webp", "image/gif": "gif" }[type];
+    if (!ext) {
+      console.warn(`[posts] cover rejected: content-type ${type || "missing"}`);
+      return null;
+    }
+
+    // Trust the body, not the header: Content-Length can lie or be absent.
+    const buf = new Uint8Array(await res.arrayBuffer());
+    if (buf.byteLength === 0 || buf.byteLength > COVER.maxBytes) {
+      console.warn(`[posts] cover rejected: ${buf.byteLength} bytes`);
+      return null;
+    }
+
+    const path = `${slug}.${ext}`;
+    const { error } = await supabase.storage
+      .from(COVER_BUCKET)
+      .upload(path, buf, { contentType: type, upsert: true });
+
+    if (error) {
+      console.error("[posts] cover upload failed:", error.message);
+      return null;
+    }
+
+    return supabase.storage.from(COVER_BUCKET).getPublicUrl(path).data.publicUrl;
+  } catch (e) {
+    console.error("[posts] cover re-host failed:", e instanceof Error ? e.message : e);
+    return null;
+  }
+}
 
 const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL!;
 const SERVICE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
@@ -177,6 +285,10 @@ export async function POST(request: Request) {
     slug = `${base}-${n}`;
   }
 
+  // Re-hosted before the insert so the row is written once, with its final URL.
+  const rawCover = str(b.cover_image_url, 2000);
+  const coverUrl = rawCover ? await rehostCover(rawCover, slug, supabase) : null;
+
   const { data, error } = await supabase
     .from("posts")
     .insert({
@@ -184,6 +296,7 @@ export async function POST(request: Request) {
       title,
       excerpt: excerpt || null,
       body: text,
+      cover_url: coverUrl,
       tags,
       published: false, // never publishable through this endpoint
       published_at: null,
@@ -215,6 +328,10 @@ export async function POST(request: Request) {
     slug: data.slug,
     status: "draft",
     words,
+    // Explicit rather than implied: a cover that was supplied but failed to
+    // re-host reports false, so the caller can tell the difference between
+    // "no image wanted" and "image lost".
+    cover: rawCover ? coverUrl !== null : null,
     notified,
     review_url: `${SITE}/admin/posts`,
   });

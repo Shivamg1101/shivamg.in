@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import Link from "next/link";
 import { pageMeta } from "@/lib/site";
 import { BreadcrumbSchema } from "@/components/structured-data";
@@ -63,7 +64,17 @@ export default async function BlogIndexPage() {
               {posts.map((p, i) => (
                 <li key={p.id}>
                   <Reveal delay={Math.min(i, 6) * 0.05}>
-                    <article className="group relative rounded-2xl border border-border/60 bg-card/60 p-6 transition-colors hover:border-primary/40">
+                    <article className="group relative overflow-hidden rounded-2xl border border-border/60 bg-card/60 transition-colors hover:border-primary/40">
+                      {p.cover_url && (
+                        <Image
+                          src={p.cover_url}
+                          alt=""
+                          width={1200}
+                          height={630}
+                          className="aspect-[1200/630] w-full border-b border-border/60 object-cover"
+                        />
+                      )}
+                      <div className="p-6">
                       <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-[12.5px] text-muted-foreground">
                         {formatDate(p.published_at) && (
                           <time dateTime={p.published_at ?? undefined}>{formatDate(p.published_at)}</time>
@@ -96,6 +107,7 @@ export default async function BlogIndexPage() {
                           ))}
                         </ul>
                       )}
+                      </div>
                     </article>
                   </Reveal>
                 </li>

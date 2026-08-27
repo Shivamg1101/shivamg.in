@@ -125,6 +125,12 @@ export const COLLECTIONS: Record<string, Collection> = {
       { key: "slug", label: "Slug", type: "text", required: true },
       { key: "excerpt", label: "Excerpt", type: "textarea" },
       { key: "body", label: "Body", type: "markdown" },
+      {
+        key: "cover_url",
+        label: "Cover image URL",
+        type: "text",
+        help: "Filled in automatically when a brief supplies an image. Clear it to remove the cover.",
+      },
       { key: "tags", label: "Tags", type: "list", help: "One per line" },
       { key: "published", label: "Published", type: "bool" },
       { key: "published_at", label: "Publish date", type: "date" },
