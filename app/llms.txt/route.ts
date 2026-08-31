@@ -1,5 +1,5 @@
 import { SITE_URL } from "@/lib/site";
-import { getAutomations, getExperience, getProfile, getProjects } from "@/lib/queries";
+import { getAutomations, getExperience, getPosts, getProfile, getProjects } from "@/lib/queries";
 import { formatRange } from "@/lib/types";
 
 export const revalidate = 3600;
@@ -11,11 +11,12 @@ export const revalidate = 3600;
  * from what the site actually says.
  */
 export async function GET() {
-  const [profile, experience, projects, automations] = await Promise.all([
+  const [profile, experience, projects, automations, posts] = await Promise.all([
     getProfile(),
     getExperience(),
     getProjects(),
     getAutomations(),
+    getPosts(),
   ]);
 
   if (!profile) return new Response("Not found", { status: 404 });
@@ -61,12 +62,36 @@ export async function GET() {
     L.push("");
   }
 
+  // Individual posts, newest first. Without this an answer engine reading
+  // llms.txt sees the site as six static pages and never learns that any
+  // writing exists — which is most of what is worth citing.
+  const published = posts
+    .filter((p) => p.published)
+    .sort((a, b) => (b.published_at ?? "").localeCompare(a.published_at ?? ""));
+
+  if (published.length) {
+    L.push("## Writing", "");
+    L.push(
+      `${published.length} published post${published.length === 1 ? "" : "s"}. ` +
+        `Each one is a single argument developed at length, not a summary of the field.`,
+      ""
+    );
+    for (const p of published) {
+      const when = p.published_at ? p.published_at.slice(0, 10) : "";
+      L.push(`### ${p.title}`);
+      if (p.excerpt) L.push(p.excerpt);
+      L.push(`${when ? when + ". " : ""}${SITE_URL}/blog/${p.slug}`);
+      L.push("");
+    }
+  }
+
   L.push("## Pages", "");
   L.push(`- [Home](${SITE_URL}/): overview, highlights, working method`);
   L.push(`- [About](${SITE_URL}/about): background, technical stack, proficiency by tool`);
   L.push(`- [Experience](${SITE_URL}/experience): roles with metrics and achievements`);
   L.push(`- [Projects](${SITE_URL}/projects): platforms and agents, plus the automation catalogue`);
   L.push(`- [Case studies](${SITE_URL}/case-studies): architecture deep dives`);
+  L.push(`- [Blog](${SITE_URL}/blog): posts on automation, retrieval and the infrastructure underneath`);
   L.push(`- [Contact](${SITE_URL}/contact): enquiry form`);
   L.push("");
 
