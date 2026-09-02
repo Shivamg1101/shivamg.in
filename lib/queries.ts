@@ -1,4 +1,4 @@
-import { createClient } from "@/lib/supabase/server";
+import { supabasePublic } from "@/lib/supabase/public";
 import type { Automation, Experience, Post, Profile, Project } from "@/lib/types";
 
 /**
@@ -7,13 +7,13 @@ import type { Automation, Experience, Post, Profile, Project } from "@/lib/types
  */
 
 export async function getProfile(): Promise<Profile | null> {
-  const supabase = await createClient();
+  const supabase = supabasePublic;
   const { data } = await supabase.from("profile").select("*").eq("id", 1).maybeSingle();
   return data;
 }
 
 export async function getExperience(): Promise<Experience[]> {
-  const supabase = await createClient();
+  const supabase = supabasePublic;
   const { data } = await supabase
     .from("experience")
     .select("*")
@@ -23,7 +23,7 @@ export async function getExperience(): Promise<Experience[]> {
 }
 
 export async function getProjects(kind?: "project" | "case-study"): Promise<Project[]> {
-  const supabase = await createClient();
+  const supabase = supabasePublic;
   let q = supabase
     .from("projects")
     .select("*")
@@ -35,13 +35,13 @@ export async function getProjects(kind?: "project" | "case-study"): Promise<Proj
 }
 
 export async function getProject(slug: string): Promise<Project | null> {
-  const supabase = await createClient();
+  const supabase = supabasePublic;
   const { data } = await supabase.from("projects").select("*").eq("slug", slug).maybeSingle();
   return data;
 }
 
 export async function getAutomations(): Promise<Automation[]> {
-  const supabase = await createClient();
+  const supabase = supabasePublic;
   const { data } = await supabase
     .from("automations")
     .select("*")
@@ -50,7 +50,7 @@ export async function getAutomations(): Promise<Automation[]> {
 }
 
 export async function getPosts(): Promise<Post[]> {
-  const supabase = await createClient();
+  const supabase = supabasePublic;
   const { data } = await supabase
     .from("posts")
     .select("*")
@@ -59,7 +59,7 @@ export async function getPosts(): Promise<Post[]> {
 }
 
 export async function getPost(slug: string): Promise<Post | null> {
-  const supabase = await createClient();
+  const supabase = supabasePublic;
   const { data } = await supabase.from("posts").select("*").eq("slug", slug).maybeSingle();
   return data;
 }
