@@ -26,6 +26,12 @@ export function PersonSchema({
   const current = experience.find((e) => e.is_current);
   const sameAs = [profile.github_url, profile.linkedin_url].filter(Boolean);
 
+  // profile.location is a single free-text field ("Noida, India"). Putting the
+  // whole string in addressLocality gives a city called "Noida, India", which
+  // is not a place. Split it so locality and country are separate claims.
+  const [locality, ...rest] = (profile.location ?? "").split(",").map((s) => s.trim());
+  const country = rest.join(", ") || undefined;
+
   return (
     <Ld
       data={{
@@ -37,9 +43,34 @@ export function PersonSchema({
         jobTitle: profile.headline,
         description: profile.tagline ?? undefined,
         email: profile.email ? `mailto:${profile.email}` : undefined,
-        address: profile.location
-          ? { "@type": "PostalAddress", addressLocality: profile.location }
+        address: locality
+          ? {
+              "@type": "PostalAddress",
+              addressLocality: locality,
+              addressRegion: "Delhi NCR",
+              addressCountry: country === "India" ? "IN" : country,
+            }
           : undefined,
+        // jobTitle is a string; hasOccupation is the typed claim, and it is the
+        // one that carries *where* the work happens. Without it there is nothing
+        // tying "AI & Automation Engineer" to a location at all — the address
+        // only says where the person is, not what they do there.
+        hasOccupation: {
+          "@type": "Occupation",
+          name: profile.headline,
+          occupationLocation: [
+            locality ? { "@type": "City", name: locality } : undefined,
+            { "@type": "AdministrativeArea", name: "Delhi NCR" },
+            { "@type": "Country", name: "India" },
+          ].filter(Boolean),
+          skills: [
+            "Workflow automation",
+            "n8n",
+            "Retrieval-augmented generation",
+            "AI agents",
+            "Full-stack development",
+          ],
+        },
         sameAs: sameAs.length ? sameAs : undefined,
         worksFor: current
           ? { "@type": "Organization", name: current.company }
