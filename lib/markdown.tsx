@@ -136,7 +136,12 @@ function inline(text: string, keyPrefix: string): ReactNode[] {
       const href = link[2];
       // Only http(s), mailto and site-relative links survive. Anything else —
       // javascript:, data:, vbscript: — renders as plain text.
-      const safe = /^(https?:\/\/|mailto:|\/)/i.test(href);
+      //
+      // "//evil.example" is the awkward case: it begins with a slash, so it
+      // reads as site-relative and is rendered without target/rel, yet the
+      // browser treats it as protocol-relative and leaves the site. Excluded
+      // explicitly, so a link that looks internal always is.
+      const safe = /^(https?:\/\/|mailto:|\/)/i.test(href) && !href.startsWith("//");
       nodes.push(
         safe ? (
           <a

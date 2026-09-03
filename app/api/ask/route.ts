@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
-import crypto from "crypto";
 import { buildContext, systemPrompt } from "@/lib/chat-context";
+import { hashClientIp } from "@/lib/client-ip";
 import { getProfile } from "@/lib/queries";
 
 /**
@@ -43,16 +43,6 @@ const OUT_OF_BUDGET =
   "Do come back tomorrow. In the meantime everything I'd have told you is on this site, " +
   "and you can reach Shivam directly at /contact.";
 
-/** Salted so the ledger holds no recoverable addresses. */
-function hashIp(req: Request): string {
-  const ip =
-    req.headers.get("x-forwarded-for")?.split(",")[0].trim() ??
-    req.headers.get("x-real-ip") ??
-    "unknown";
-  const salt = process.env.POST_INGEST_TOKEN ?? "fallback-salt";
-  return crypto.createHash("sha256").update(salt + ip).digest("hex").slice(0, 32);
-}
-
 type Turn = { role: "user" | "assistant"; content: string };
 
 export async function POST(request: Request) {
@@ -82,7 +72,7 @@ export async function POST(request: Request) {
     auth: { persistSession: false, autoRefreshToken: false },
   });
 
-  const ipHash = hashIp(request);
+  const { hash: ipHash } = hashClientIp(request);
   const dayAgo = new Date(Date.now() - 86_400_000).toISOString();
   const minuteAgo = new Date(Date.now() - 60_000).toISOString();
 

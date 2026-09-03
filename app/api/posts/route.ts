@@ -32,6 +32,10 @@ const COVER_BUCKET = "blog-covers";
  *    including the cloud metadata endpoint at 169.254.169.254, which is the
  *    classic target.
  *
+ * Redirects are followed by hand in rehostCover so that every hop comes back
+ * through this function; letting fetch follow them would make the checks above
+ * decorative, since only the first URL would ever be examined.
+ *
  * The remaining gap is a public hostname that resolves to a private address.
  * Closing that needs DNS resolution plus a pinned-IP fetch, which is more
  * machinery than this is worth: the endpoint is already behind a bearer token,
@@ -87,10 +91,27 @@ async function rehostCover(
   }
 
   try {
-    const res = await fetch(url, {
-      redirect: "follow",
-      signal: AbortSignal.timeout(COVER.timeoutMs),
-    });
+    // Following redirects automatically would undo every check above: the first
+    // URL passes safeImageUrl, then a 302 sends the fetch wherever the attacker
+    // likes — including the addresses the allowlist exists to refuse. Each hop
+    // is therefore resolved by hand and re-validated before it is followed.
+    let res = await fetch(url, { redirect: "manual", signal: AbortSignal.timeout(COVER.timeoutMs) });
+    for (let hop = 0; res.status >= 300 && res.status < 400 && hop < 4; hop++) {
+      const location = res.headers.get("location");
+      if (!location) break;
+
+      const next = safeImageUrl(new URL(location, res.url).toString());
+      if (!next) {
+        console.warn("[posts] cover rejected: redirect to an unsafe address");
+        return null;
+      }
+      res = await fetch(next, { redirect: "manual", signal: AbortSignal.timeout(COVER.timeoutMs) });
+    }
+
+    if (res.status >= 300 && res.status < 400) {
+      console.warn("[posts] cover rejected: too many redirects");
+      return null;
+    }
     if (!res.ok) {
       console.warn(`[posts] cover fetch failed: HTTP ${res.status}`);
       return null;

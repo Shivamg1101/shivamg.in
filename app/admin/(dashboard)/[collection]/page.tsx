@@ -8,7 +8,11 @@ export default async function CollectionPage({
   params: Promise<{ collection: string }>;
 }) {
   const { collection } = await params;
-  const config = COLLECTIONS[collection];
+  // hasOwn, not a bare lookup: `collection` comes from the URL, and keys like
+  // "constructor" or "__proto__" resolve to inherited members of Object rather
+  // than to undefined, so a plain truthiness check would sail past notFound()
+  // and hand the editor a nonsense config.
+  const config = Object.hasOwn(COLLECTIONS, collection) ? COLLECTIONS[collection] : undefined;
   if (!config) notFound();
 
   return (

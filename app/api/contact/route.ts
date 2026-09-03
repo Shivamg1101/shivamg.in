@@ -1,9 +1,16 @@
 import { NextResponse } from "next/server";
 import { Resend } from "resend";
+import { createClient as createServiceClient } from "@supabase/supabase-js";
 import { createClient } from "@/lib/supabase/server";
+
+const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL!;
+const SERVICE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
 /** Matches the CHECK constraints on public.messages. */
 const LIMITS = { name: 120, email: 200, message: 4000 };
+
+/** Well above any real week here, far below a bot's idea of a good time. */
+const NOTIFY_CAP_PER_HOUR = 20;
 
 function clean(v: unknown, max: number) {
   return typeof v === "string" ? v.trim().slice(0, max) : "";
@@ -42,7 +49,19 @@ export async function POST(request: Request) {
   if (trap) return NextResponse.json({ ok: true });
 
   // 1. Store it. This is the durable record — email is only a notification.
-  const supabase = await createClient();
+  //
+  // Written with the service role rather than the visitor's anonymous session.
+  // That is what lets the row-level policy on `messages` refuse anonymous
+  // inserts outright: without it, anyone could POST at the Supabase REST API
+  // directly and put rows in the table, skipping the honeypot, the length caps,
+  // the address check and the throttle below. Routing every write through this
+  // handler makes those checks the only way in rather than a polite suggestion.
+  const supabase = SERVICE_KEY
+    ? createServiceClient(SUPABASE_URL, SERVICE_KEY, {
+        auth: { persistSession: false, autoRefreshToken: false },
+      })
+    : await createClient();
+
   const { error: dbError } = await supabase.from("messages").insert({ name, email, message });
 
   if (dbError) {
@@ -51,6 +70,24 @@ export async function POST(request: Request) {
   }
 
   // 2. Notify. A failure here must not lose the message.
+  //
+  // Throttle the notification, never the storage. Anyone can post this form as
+  // fast as they like, and each send costs against a finite Resend allowance —
+  // so a bot could burn the month's quota in minutes and take down the alerting
+  // for every genuine enquiry that followed. Capping emails rather than inserts
+  // keeps the cost bounded while honouring the rule above: the row is the
+  // durable record, the email is only a notification. Nothing is ever dropped;
+  // anything unmailed is still sitting in /admin/messages.
+  const { count: recent } = await supabase
+    .from("messages")
+    .select("id", { count: "exact", head: true })
+    .gte("created_at", new Date(Date.now() - 3_600_000).toISOString());
+
+  if ((recent ?? 0) > NOTIFY_CAP_PER_HOUR) {
+    console.warn(`[contact] notification suppressed: ${recent} messages in the last hour`);
+    return NextResponse.json({ ok: true, emailed: false });
+  }
+
   const key = process.env.RESEND_API_KEY;
   if (!key) {
     console.warn("[contact] RESEND_API_KEY not set — stored without emailing.");
