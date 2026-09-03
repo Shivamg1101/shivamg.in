@@ -1,9 +1,63 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import Link from "next/link";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 
 type Turn = { role: "user" | "assistant"; content: string };
+
+/**
+ * Turns the paths, URLs and addresses the model mentions into real links.
+ *
+ * Site paths are matched against a fixed list of routes rather than "anything
+ * starting with a slash", because answers are full of things like "800/80
+ * chunking" that are not links. Only https and mailto are ever emitted, and
+ * everything is rendered as React elements, so model output can never become
+ * markup.
+ */
+const ROUTES = "contact|about|projects|experience|case-studies|blog";
+const LINKABLE_SOURCE =
+  `(https?://[^\\s<>()]+[^\\s<>().,;:!?])` +
+  `|([A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,})` +
+  `|(/(?:${ROUTES})(?:/[A-Za-z0-9\\-_]+)*)`;
+
+function RichText({ text, onNavigate }: { text: string; onNavigate: () => void }) {
+  const out: React.ReactNode[] = [];
+  let last = 0;
+  let n = 0;
+
+  const cls = "underline underline-offset-2 hover:opacity-80";
+
+  // matchAll over a fresh regex: no shared lastIndex to reset, so two messages
+  // rendering in the same tick cannot interfere with each other.
+  for (const m of text.matchAll(new RegExp(LINKABLE_SOURCE, "g"))) {
+    if (m.index! > last) out.push(text.slice(last, m.index));
+    const [tok, url, email, path] = m;
+    const key = `l${n++}`;
+
+    if (url && /^https:\/\//i.test(url)) {
+      out.push(
+        <a key={key} href={url} target="_blank" rel="noopener noreferrer" className={cls}>
+          {url.replace(/^https:\/\//, "")}
+        </a>
+      );
+    } else if (email) {
+      out.push(<a key={key} href={`mailto:${email}`} className={cls}>{email}</a>);
+    } else if (path) {
+      out.push(
+        <Link key={key} href={path} onClick={onNavigate} className={cls}>
+          {path}
+        </Link>
+      );
+    } else {
+      out.push(tok); // http:// and anything else stays inert text
+    }
+    last = m.index! + tok.length;
+  }
+
+  if (last < text.length) out.push(text.slice(last));
+  return <>{out}</>;
+}
 
 const SUGGESTIONS = [
   "What does he actually automate?",
@@ -193,10 +247,14 @@ export function AskWidget() {
                     className={
                       t.role === "user"
                         ? "max-w-[85%] rounded-2xl rounded-br-sm bg-primary px-3.5 py-2 text-[13px] leading-relaxed text-primary-foreground"
-                        : "max-w-[90%] whitespace-pre-wrap rounded-2xl rounded-bl-sm border border-border bg-background/60 px-3.5 py-2 text-[13px] leading-relaxed"
+                        : "max-w-[90%] whitespace-pre-wrap rounded-2xl rounded-bl-sm border border-border bg-background/60 px-3.5 py-2 text-[13px] leading-relaxed [&_a]:text-primary"
                     }
                   >
-                    {t.content}
+                    {t.role === "assistant" ? (
+                      <RichText text={t.content} onNavigate={() => setOpen(false)} />
+                    ) : (
+                      t.content
+                    )}
                   </div>
                 </div>
               ))}
