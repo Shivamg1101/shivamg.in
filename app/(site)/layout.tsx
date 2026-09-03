@@ -1,3 +1,4 @@
+import { AskWidget } from "@/components/ask-widget";
 import { Header } from "@/components/header";
 import { ScrollProgress } from "@/components/motion";
 import { Footer } from "@/components/sections";
@@ -15,6 +16,7 @@ export default async function SiteLayout({ children }: { children: React.ReactNo
       <Header name={profile?.name ?? "Portfolio"} />
       <main id="main">{children}</main>
       {profile && <Footer profile={profile} />}
+      <AskWidget />
     </>
   );
 }
