@@ -1,117 +1,68 @@
--- Row-level security, written down.
+-- Close anonymous INSERT on public.messages, and write down the policies.
 --
--- The policies protecting this database were created by hand in the Supabase
--- dashboard and existed nowhere in this repository. That is the real problem
--- this file fixes: the rules deciding who can read the contact inbox were not
--- reviewable, not diffable, and would not survive rebuilding the project. An
--- audit had to probe the live API to discover what they were.
+-- ---------------------------------------------------------------------------
+-- A correction, kept deliberately.
 --
--- Everything here is idempotent and states the intended end position rather
--- than a delta, so it can be run against the current database safely and re-run
--- later to confirm nothing has drifted.
+-- The first draft of this file recreated every policy from scratch, on the
+-- assumption that a black-box probe of the REST API had shown what they were.
+-- Reading pg_policies before applying it showed that assumption was wrong three
+-- times over, and that running it would have made this database materially less
+-- safe than it already was:
 --
--- Verified behaviour this preserves (probed against production 2026-09-03):
---   * anonymous SELECT works on the public content tables
---   * anonymous SELECT on messages and chat_usage returns nothing
---   * anonymous UPDATE is refused on every content table
---   * anonymous upload to the blog-covers bucket is refused
+--   1. Admin writes are gated on is_admin(), an allowlist keyed to the email in
+--      the JWT. The draft would have replaced that with `using (true)` for the
+--      authenticated role, so ANY signed-in Supabase user could have rewritten
+--      every table on the site.
+--   2. chat_usage deliberately carries no policies at all. RLS is on, so that
+--      denies every client role while the service role still bypasses it. The
+--      draft would have ADDED a read policy for authenticated users, exposing
+--      the visitor IP ledger it was supposed to protect.
+--   3. messages has four narrow policies. Collapsing them into one FOR ALL
+--      policy would have opened the contact inbox to any authenticated user.
 --
--- The one deliberate change is to messages: see below.
+-- It would also have failed at its actual purpose: the live policy is named
+-- "messages anon insert", with spaces, so `drop policy if exists
+-- messages_anon_insert` matches nothing and the insert would have survived.
+-- Permissive policies OR together, so the result would have been the old policy
+-- and a wider new one, both in force.
+--
+-- The lesson is the point of the comment: probing an API from outside shows you
+-- behaviour, not policy. Read the catalogue before rewriting authorisation.
+-- ---------------------------------------------------------------------------
+--
+-- The policies as they actually stand, verified against pg_policies on
+-- 2026-09-03. Everything below is left exactly as it is:
+--
+--   profile, experience, automations
+--     "<table> public read"   SELECT  anon, authenticated  using (true)
+--     "<table> admin write"   ALL     authenticated        using/check is_admin()
+--
+--   posts, projects
+--     "<table> public read"   SELECT  anon, authenticated  using (published)
+--     "<table> admin write"   ALL     authenticated        using/check is_admin()
+--
+--   messages
+--     "messages admin read"   SELECT  authenticated        using (is_admin())
+--     "messages admin update" UPDATE  authenticated        using/check is_admin()
+--     "messages admin delete" DELETE  authenticated        using (is_admin())
+--     "messages anon insert"  INSERT  anon, authenticated  check (true)   <- dropped
+--
+--   chat_usage, admins
+--     RLS enabled, no policies: denied to every client role, service role only.
+--
+-- The single change is the last line of the messages block.
+--
+-- Why: the contact handler used to write as the visitor, so anonymous INSERT
+-- had to be open — and that meant the Supabase REST endpoint accepted rows
+-- directly, making the honeypot, the length caps, the address validation and
+-- the notification throttle all optional for anyone who skipped the form and
+-- posted at the API instead. The handler now writes with the service role,
+-- which bypasses RLS, so the policy can go and every write has to come through
+-- the checks. That application change is already deployed and verified live,
+-- so this is safe to run now.
 
 begin;
 
-alter table public.profile     enable row level security;
-alter table public.experience  enable row level security;
-alter table public.projects    enable row level security;
-alter table public.automations enable row level security;
-alter table public.posts       enable row level security;
-alter table public.messages    enable row level security;
-alter table public.chat_usage  enable row level security;
-
--- ---------------------------------------------------------------------------
--- Public content: anyone may read, only a signed-in admin may write.
--- ---------------------------------------------------------------------------
-
-do $$
-declare t text;
-begin
-  foreach t in array array['profile', 'experience', 'automations'] loop
-    execute format('drop policy if exists %I on public.%I', t || '_public_read', t);
-    execute format('drop policy if exists %I on public.%I', t || '_admin_write', t);
-
-    execute format(
-      'create policy %I on public.%I for select to anon, authenticated using (true)',
-      t || '_public_read', t);
-
-    -- One FOR ALL policy covers insert, update and delete. USING governs which
-    -- existing rows may be touched; WITH CHECK governs the resulting row, and
-    -- both are needed or an update could rewrite a row into a state the policy
-    -- would never have allowed to be inserted.
-    execute format(
-      'create policy %I on public.%I for all to authenticated using (true) with check (true)',
-      t || '_admin_write', t);
-  end loop;
-end $$;
-
--- posts and projects additionally hide drafts from the public. The audit could
--- not tell from outside whether this was already the case (there happened to be
--- no drafts at the time), so it is asserted here rather than assumed.
-do $$
-declare t text;
-begin
-  foreach t in array array['posts', 'projects'] loop
-    execute format('drop policy if exists %I on public.%I', t || '_public_read', t);
-    execute format('drop policy if exists %I on public.%I', t || '_admin_write', t);
-
-    execute format(
-      'create policy %I on public.%I for select to anon, authenticated
-         using (published = true or auth.role() = ''authenticated'')',
-      t || '_public_read', t);
-
-    execute format(
-      'create policy %I on public.%I for all to authenticated using (true) with check (true)',
-      t || '_admin_write', t);
-  end loop;
-end $$;
-
--- ---------------------------------------------------------------------------
--- Contact inbox: nobody anonymous reads it, and as of this migration nobody
--- anonymous writes it either.
---
--- Anonymous INSERT used to be permitted because the contact handler wrote as
--- the visitor. That meant the Supabase REST endpoint accepted rows directly,
--- so the honeypot, the length caps, the address validation and the notification
--- throttle were all optional for anyone who skipped the form and posted at the
--- API. The handler now writes with the service role, which bypasses RLS, so
--- this can be closed without breaking the form.
---
--- Order matters on deploy: ship the application change first, then run this.
--- The other way round leaves the form briefly unable to store anything.
--- ---------------------------------------------------------------------------
-
-drop policy if exists messages_public_insert on public.messages;
-drop policy if exists messages_anon_insert   on public.messages;
-drop policy if exists messages_admin_all     on public.messages;
-
-create policy messages_admin_all on public.messages
-  for all to authenticated using (true) with check (true);
-
--- ---------------------------------------------------------------------------
--- Chat ledger: salted IP hashes and timestamps. Written and pruned by the
--- /api/ask handler with the service role; no client role needs any access.
--- ---------------------------------------------------------------------------
-
-drop policy if exists chat_usage_admin_read on public.chat_usage;
-
-create policy chat_usage_admin_read on public.chat_usage
-  for select to authenticated using (true);
+drop policy if exists "messages anon insert" on public.messages;
 
 commit;
-
--- After running, confirm from a terminal that the inbox is still private.
--- Both should return an empty array:
---
---   curl "$SUPABASE_URL/rest/v1/messages?select=*" \
---        -H "apikey: $PUBLISHABLE_KEY" -H "Authorization: Bearer $PUBLISHABLE_KEY"
---   curl "$SUPABASE_URL/rest/v1/chat_usage?select=*" \
---        -H "apikey: $PUBLISHABLE_KEY" -H "Authorization: Bearer $PUBLISHABLE_KEY"
