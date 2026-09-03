@@ -17,9 +17,21 @@ type Turn = { role: "user" | "assistant"; content: string };
  */
 const ROUTES = "contact|about|projects|experience|case-studies|blog";
 const LINKABLE_SOURCE =
-  `(https?://[^\\s<>()]+[^\\s<>().,;:!?])` +
+  `(\\*\\*[^*\\n]+\\*\\*)` +
+  `|(https?://[^\\s<>()]+[^\\s<>().,;:!?])` +
   `|([A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,})` +
   `|(/(?:${ROUTES})(?:/[A-Za-z0-9\\-_]+)*)`;
+
+/**
+ * Models emit markdown however firmly the prompt asks them not to, and the
+ * bubble renders text verbatim, so "- **Internal tooling**" reached visitors
+ * with the asterisks showing. Hyphen bullets become real bullets here and bold
+ * is a token below. The prompt asks for plain prose as well; this is the half
+ * that does not depend on the model complying.
+ */
+function tidy(text: string): string {
+  return text.replace(/^[ \t]*[-*][ \t]+/gm, "• ");
+}
 
 function RichText({ text, onNavigate }: { text: string; onNavigate: () => void }) {
   const out: React.ReactNode[] = [];
@@ -30,12 +42,20 @@ function RichText({ text, onNavigate }: { text: string; onNavigate: () => void }
 
   // matchAll over a fresh regex: no shared lastIndex to reset, so two messages
   // rendering in the same tick cannot interfere with each other.
-  for (const m of text.matchAll(new RegExp(LINKABLE_SOURCE, "g"))) {
-    if (m.index! > last) out.push(text.slice(last, m.index));
-    const [tok, url, email, path] = m;
+  const body = tidy(text);
+
+  for (const m of body.matchAll(new RegExp(LINKABLE_SOURCE, "g"))) {
+    if (m.index! > last) out.push(body.slice(last, m.index));
+    const [tok, bold, url, email, path] = m;
     const key = `l${n++}`;
 
-    if (url && /^https:\/\//i.test(url)) {
+    if (bold) {
+      out.push(
+        <strong key={key} className="font-semibold">
+          {bold.slice(2, -2)}
+        </strong>
+      );
+    } else if (url && /^https:\/\//i.test(url)) {
       out.push(
         <a key={key} href={url} target="_blank" rel="noopener noreferrer" className={cls}>
           {url.replace(/^https:\/\//, "")}
@@ -55,7 +75,7 @@ function RichText({ text, onNavigate }: { text: string; onNavigate: () => void }
     last = m.index! + tok.length;
   }
 
-  if (last < text.length) out.push(text.slice(last));
+  if (last < body.length) out.push(body.slice(last));
   return <>{out}</>;
 }
 
