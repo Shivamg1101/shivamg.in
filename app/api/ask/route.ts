@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 import { buildContext, systemPrompt } from "@/lib/chat-context";
 import { hashClientIp } from "@/lib/client-ip";
+import { redact } from "@/lib/redact";
 import { getProfile } from "@/lib/queries";
 
 /**
@@ -103,7 +104,9 @@ export async function POST(request: Request) {
   const system = systemPrompt(context, profile?.name ?? "Shivam Gupta");
 
   let answer: string | null = null;
+  let usedModel = "";
   let lastError = "";
+  const startedAt = Date.now();
 
   for (const model of MODELS) {
     try {
@@ -134,6 +137,7 @@ export async function POST(request: Request) {
       const text = data?.choices?.[0]?.message?.content;
       if (typeof text === "string" && text.trim()) {
         answer = text.trim();
+        usedModel = model;
         break;
       }
       lastError = `${model}: empty response`;
@@ -153,15 +157,30 @@ export async function POST(request: Request) {
   }
 
   // Only successful answers count against the budget — a failed call to us
-  // shouldn't cost the visitor one of their eight.
-  await supabase.from("chat_usage").insert({ ip_hash: ipHash });
+  // shouldn't cost the visitor one of their three.
+  //
+  // The exchange is kept so the answers can be reviewed: this thing talks to
+  // recruiters, and until now there was no record of anything it had said. The
+  // question is redacted first — visitors type their own phone numbers and
+  // email addresses into chat boxes, and storing those means holding personal
+  // data nobody asked for. His own address is exempt in the answer, because
+  // whether the agent routes people to the right place is exactly what the log
+  // is for.
+  await supabase.from("chat_usage").insert({
+    ip_hash: ipHash,
+    question: redact(message),
+    answer: redact(answer, profile?.email ? [profile.email] : []),
+    model: usedModel,
+    ms: Date.now() - startedAt,
+  });
 
-  // Opportunistic prune. Nothing older than two days is ever read.
+  // Opportunistic prune. Thirty days is long enough to spot a pattern and short
+  // enough that nothing accumulates; the limiter only ever counts 24 hours.
   if (Math.random() < 0.05) {
     await supabase
       .from("chat_usage")
       .delete()
-      .lt("created_at", new Date(Date.now() - 2 * 86_400_000).toISOString());
+      .lt("created_at", new Date(Date.now() - 30 * 86_400_000).toISOString());
   }
 
   return NextResponse.json({ answer, limited: false });

@@ -246,6 +246,15 @@ export function AskWidget() {
                     I can answer questions about his work, the systems he&apos;s built and what he&apos;s
                     working with. Everything I say comes from this site.
                   </p>
+                  {/*
+                    Shown before anyone types, not buried in a policy page. The
+                    log exists so Shivam can check my answers are accurate — so
+                    saying plainly that it exists is the least it can do.
+                  */}
+                  <p className="text-[11.5px] leading-relaxed text-muted-foreground/80">
+                    Conversations are kept for 30 days so he can check my answers. Contact details are
+                    removed automatically — please don&apos;t share anything sensitive here.
+                  </p>
                   <div className="flex flex-wrap gap-2">
                     {SUGGESTIONS.map((s) => (
                       <button
