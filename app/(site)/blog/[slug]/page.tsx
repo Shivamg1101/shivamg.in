@@ -172,6 +172,37 @@ export default async function BlogPostPage({
                 priority
                 className="mt-8 aspect-[1200/630] w-full rounded-2xl border border-border object-cover"
               />
+              {/* Pexels' terms require a credit to the photographer and a
+                  prominent link back, so a stock cover cannot ship without
+                  this. Rendered from the row rather than reconstructed: once
+                  the file is re-hosted into our own storage it carries no
+                  trace of where it came from. */}
+              {post.cover_credit && (
+                <p className="mt-3 text-center text-[12px] text-muted-foreground">
+                  Photo by{" "}
+                  {post.cover_credit_url ? (
+                    <a
+                      href={post.cover_credit_url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="underline underline-offset-2 hover:text-foreground"
+                    >
+                      {post.cover_credit}
+                    </a>
+                  ) : (
+                    post.cover_credit
+                  )}{" "}
+                  on{" "}
+                  <a
+                    href={post.cover_source_url || "https://www.pexels.com"}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="underline underline-offset-2 hover:text-foreground"
+                  >
+                    Pexels
+                  </a>
+                </p>
+              )}
             </Reveal>
           )}
 

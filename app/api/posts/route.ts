@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 import { Resend } from "resend";
 import crypto from "crypto";
+import { coverQuery, findCover, type PexelsCover } from "@/lib/pexels";
 
 /**
  * Draft ingest for the automation pipeline.
@@ -307,8 +308,26 @@ export async function POST(request: Request) {
   }
 
   // Re-hosted before the insert so the row is written once, with its final URL.
+  //
+  // A supplied cover always wins. Only when none is given does this fall back
+  // to Pexels, so an automated draft still arrives with an image — a post with
+  // no cover shares to LinkedIn with the generic site card, which wastes the
+  // impression the post was written to earn.
   const rawCover = str(b.cover_image_url, 2000);
-  const coverUrl = rawCover ? await rehostCover(rawCover, slug, supabase) : null;
+  let coverUrl: string | null = null;
+  let credit: PexelsCover | null = null;
+
+  if (rawCover) {
+    coverUrl = await rehostCover(rawCover, slug, supabase);
+  } else {
+    const found = await findCover(coverQuery(title, tags));
+    if (found) {
+      coverUrl = await rehostCover(found.url, slug, supabase);
+      // Credit only if the file actually landed. Attribution pointing at an
+      // image that failed to re-host would be worse than none at all.
+      if (coverUrl) credit = found;
+    }
+  }
 
   const { data, error } = await supabase
     .from("posts")
@@ -318,6 +337,9 @@ export async function POST(request: Request) {
       excerpt: excerpt || null,
       body: text,
       cover_url: coverUrl,
+      cover_credit: credit?.credit ?? null,
+      cover_credit_url: credit?.creditUrl || null,
+      cover_source_url: credit?.sourceUrl || null,
       tags,
       published: false, // never publishable through this endpoint
       published_at: null,
@@ -353,6 +375,9 @@ export async function POST(request: Request) {
     // re-host reports false, so the caller can tell the difference between
     // "no image wanted" and "image lost".
     cover: rawCover ? coverUrl !== null : null,
+    // Which route produced the image, so a caller can tell a supplied cover
+    // from a fallback one without guessing.
+    cover_source: coverUrl ? (rawCover ? "supplied" : credit ? "pexels" : null) : null,
     notified,
     review_url: `${SITE}/admin/posts`,
   });

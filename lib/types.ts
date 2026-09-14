@@ -74,6 +74,9 @@ export type Post = {
   excerpt: string | null;
   body: string;
   cover_url: string | null;
+  cover_credit: string | null;
+  cover_credit_url: string | null;
+  cover_source_url: string | null;
   tags: string[];
   published: boolean;
   published_at: string | null;
