@@ -49,3 +49,4 @@ design/*.png
 
 # local screenshot scratch
 .shots/
+scripts/compiled/
