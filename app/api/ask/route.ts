@@ -29,10 +29,25 @@ const LIMITS = {
   historyTurns: 6, // how much conversation to send back
 };
 
-// Free model availability changes without notice — deepseek's free tier was
-// withdrawn between building this and testing it. A single hardcoded slug means
-// the feature 404s silently one morning, so try a second before giving up.
-const MODELS = ["minimax/minimax-m3:free", "google/gemma-4-31b-it:free"];
+// Free model availability changes without notice, and two fallbacks were not
+// enough: on 2026-09-15 the agent was found returning the error reply to every
+// visitor because minimax/minimax-m3:free had been withdrawn from OpenRouter
+// entirely and the single fallback was rate-limited behind it. Nobody noticed,
+// because a failed answer writes no row — the ledger looked like silence rather
+// than breakage.
+//
+// Ordered widest-context first. The corpus is ~19k tokens before the question,
+// so anything under about 32k is unusable; every model here was confirmed
+// present in OpenRouter's catalogue and above that floor at the time of writing.
+// Check https://openrouter.ai/api/v1/models before changing this list — a slug
+// that no longer exists fails exactly as silently as one that is rate-limited.
+const MODELS = [
+  "thinkingmachines/inkling:free",
+  "nvidia/nemotron-3.5-lightning:free",
+  "nex-agi/nex-n2.5-pro:free",
+  "google/gemma-4-31b-it:free",
+  "inclusionai/ling-3.0-flash-vl:free",
+];
 
 const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL!;
 const SERVICE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
@@ -148,6 +163,20 @@ export async function POST(request: Request) {
 
   if (!answer) {
     console.error("[ask] all models failed:", lastError);
+
+    // Record the failure. Until now only successful answers were written, so a
+    // completely broken agent produced an empty table — indistinguishable from
+    // nobody visiting. That is how this went unnoticed for over a week. The row
+    // carries no answer and names the last error, so `select * from chat_usage
+    // where answer is null` is the health check.
+    await supabase.from("chat_usage").insert({
+      ip_hash: ipHash,
+      question: redact(message),
+      answer: null,
+      model: `FAILED: ${lastError}`.slice(0, 300),
+      ms: Date.now() - startedAt,
+    });
+
     return NextResponse.json({
       answer:
         "Something went wrong on my end just then. Everything I'd have told you is on this site, " +
