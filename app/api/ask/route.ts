@@ -46,10 +46,16 @@ const LIMITS = {
 // process: 1. Analyze User Input" — its scratchpad, verbatim. Availability is
 // not the only thing that matters here; the reply is read by a stranger with no
 // idea what a chain of thought is.
+// Ordered by what has actually been observed answering, not by what the names
+// suggest. nvidia/nemotron-3.5-lightning:free was removed outright: despite
+// "lightning" it is a reasoning model and returned its scratchpad twice, and the
+// stripper below only caught the header, leaving the numbered steps in place.
+// ling-3.0-flash-vl answered cleanly and leads for that reason; gemma is an
+// instruct model and stays as a fallback, though it was failing when this was
+// written.
 const MODELS = [
-  "google/gemma-4-31b-it:free",
-  "nvidia/nemotron-3.5-lightning:free",
   "inclusionai/ling-3.0-flash-vl:free",
+  "google/gemma-4-31b-it:free",
   "nex-agi/nex-n2.5-pro:free",
 ];
 
