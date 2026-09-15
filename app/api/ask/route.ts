@@ -131,14 +131,23 @@ export async function POST(request: Request) {
 
   // Three counts, one round trip each. Cheap enough at this volume, and far
   // simpler to reason about than a single clever query.
+  // `answer is not null` matters: failures are recorded here too, so that a
+  // broken agent is visible rather than looking like an empty table. But they
+  // must not be counted — the budget exists to cap what OpenRouter is asked to
+  // do, and a visitor who got an error should not have paid for it out of their
+  // three questions. Counting them would also mean an outage locks everyone out
+  // on top of already being broken.
   const [globalDay, ipDay, globalMinute] = await Promise.all([
-    supabase.from("chat_usage").select("id", { count: "exact", head: true }).gte("created_at", dayAgo),
+    supabase.from("chat_usage").select("id", { count: "exact", head: true })
+      .not("answer", "is", null).gte("created_at", dayAgo),
     supabase
       .from("chat_usage")
       .select("id", { count: "exact", head: true })
+      .not("answer", "is", null)
       .eq("ip_hash", ipHash)
       .gte("created_at", dayAgo),
-    supabase.from("chat_usage").select("id", { count: "exact", head: true }).gte("created_at", minuteAgo),
+    supabase.from("chat_usage").select("id", { count: "exact", head: true })
+      .not("answer", "is", null).gte("created_at", minuteAgo),
   ]);
 
   const overLimit =
