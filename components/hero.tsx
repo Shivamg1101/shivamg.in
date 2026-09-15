@@ -208,10 +208,16 @@ export function Hero({ profile }: { profile: Profile }) {
   const reduce = useReducedMotion();
   const still = Boolean(reduce);
   const greeting = useTypewriter(GREETINGS, !still);
+  // Transform only, deliberately no opacity. framer-motion writes `initial`
+  // into the server-rendered markup, so fading in meant the whole hero shipped
+  // as opacity:0 and could not paint until the bundle hydrated — 1,495ms of a
+  // 1,558ms LCP, on text that was in the HTML from the first byte. A translated
+  // element still paints, so the content appears immediately and rises into
+  // place; the stagger below survives because the delays are unchanged.
   const rise = useMemo(
     () => ({
-      initial: { opacity: 0, y: 24 },
-      animate: { opacity: 1, y: 0 },
+      initial: { y: 24 },
+      animate: { y: 0 },
       transition: { duration: 0.7, ease: [0.25, 0.1, 0.25, 1] as const },
     }),
     []
