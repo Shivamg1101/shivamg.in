@@ -42,7 +42,7 @@ export default async function ExperiencePage() {
         <div aria-hidden className="absolute -right-40 top-0 h-80 w-80 rounded-full bg-blue-500/5 blur-3xl" />
 
         <div className="relative mx-auto max-w-6xl px-6 text-center">
-          <Reveal>
+          <Reveal immediate>
             <h1 className="text-4xl font-extrabold sm:text-5xl lg:text-6xl">
               Automation &amp;{" "}
               <span className="bg-gradient-to-r from-primary to-blue-500 bg-clip-text text-transparent">

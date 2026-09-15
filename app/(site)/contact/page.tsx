@@ -28,7 +28,7 @@ export default async function ContactPage() {
       />
       <section className="pt-10">
         <div className="mx-auto max-w-6xl px-6">
-          <Reveal className="grid gap-4 md:grid-cols-3">
+          <Reveal immediate className="grid gap-4 md:grid-cols-3">
             {[
               {
                 h: "What I can help with",

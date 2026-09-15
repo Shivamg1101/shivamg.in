@@ -8,22 +8,51 @@ const EASE = [0.25, 0.1, 0.25, 1] as const;
 const DURATION = 0.7;
 const VIEWPORT = { once: true, margin: "50px" } as const;
 
-/** Fade + rise on entering the viewport. */
+/**
+ * Fade + rise on entering the viewport.
+ *
+ * `immediate` is for anything above the fold. framer-motion writes its initial
+ * state into the server-rendered HTML, so a normal Reveal ships as
+ * `opacity:0` — the text is in the document but cannot paint until the bundle
+ * downloads, hydrates and the animation finishes. On /about that was 1,287ms of
+ * a 1,347ms LCP: the server answered in 60ms and then the page sat invisible.
+ *
+ * The immediate variant animates transform only. A translated element still
+ * paints, so LCP fires at first paint while the content slides into place —
+ * the motion is kept, the delay is not. It also uses `animate` rather than
+ * `whileInView`, since waiting for an IntersectionObserver to report something
+ * already on screen is pure latency.
+ */
 export function Reveal({
   children,
   delay = 0,
   y = 30,
   x = 0,
   className,
+  immediate = false,
 }: {
   children: ReactNode;
   delay?: number;
   y?: number;
   x?: number;
   className?: string;
+  immediate?: boolean;
 }) {
   const reduce = useReducedMotion();
   if (reduce) return <div className={className}>{children}</div>;
+
+  if (immediate) {
+    return (
+      <motion.div
+        className={className}
+        initial={{ x, y }}
+        animate={{ x: 0, y: 0 }}
+        transition={{ delay, duration: DURATION, ease: EASE }}
+      >
+        {children}
+      </motion.div>
+    );
+  }
 
   return (
     <motion.div

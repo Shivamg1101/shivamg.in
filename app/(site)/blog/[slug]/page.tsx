@@ -121,7 +121,7 @@ export default async function BlogPostPage({
         <div aria-hidden className="absolute -left-40 -top-40 h-80 w-80 rounded-full bg-primary/5 blur-3xl" />
 
         <div className="relative mx-auto max-w-2xl px-6">
-          <Reveal>
+          <Reveal immediate>
             <Link
               href="/blog"
               className="inline-flex items-center gap-2 text-sm font-semibold text-primary hover:underline"

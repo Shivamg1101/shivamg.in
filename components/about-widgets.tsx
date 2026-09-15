@@ -45,7 +45,11 @@ export function ProfileTabs({ tabs }: { tabs: Tab[] }) {
         transition={{ duration: 0.35, ease: EASE }}
         className="mt-4 rounded-xl border border-border bg-card/60 p-5 backdrop-blur-sm"
       >
-        <h3 className="text-base font-bold">{t.heading}</h3>
+        {/* h2, not h3: this panel is the first heading after the page's h1, so
+            an h3 skips a level. Screen-reader users navigate by heading and a
+            gap reads as a missing section. The size is set by the class, not by
+            the tag, so nothing moves visually. */}
+        <h2 className="text-base font-bold">{t.heading}</h2>
         <p className="mt-3 text-sm leading-relaxed text-muted-foreground">{t.body}</p>
         <div className="mt-4 flex flex-wrap gap-2">
           {t.tags.map((tag) => (

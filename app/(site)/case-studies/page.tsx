@@ -27,7 +27,7 @@ export default async function CaseStudiesPage() {
         <div aria-hidden className="absolute -right-40 top-0 h-80 w-80 rounded-full bg-blue-500/5 blur-3xl" />
 
         <div className="relative mx-auto max-w-6xl px-6 text-center">
-          <Reveal>
+          <Reveal immediate>
             <span className="inline-flex rounded-full border border-primary/20 bg-primary/10 px-4 py-2 text-sm font-semibold text-primary">
               Architecture Deep Dives
             </span>
