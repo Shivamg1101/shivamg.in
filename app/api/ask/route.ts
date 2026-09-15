@@ -17,13 +17,13 @@ import { getProfile } from "@/lib/queries";
 
 const LIMITS = {
   perDayGlobal: 40, // under OpenRouter's 50 — headroom for retries and my own testing
-  // Deliberately tight while the global budget is 40. On a day when a post
-  // sends a crowd at once, breadth beats depth: at 8 apiece five people can
-  // drain the day before the sixth arrives, whereas at 3 the same budget
-  // serves thirteen. Most visitors ask one or two questions and leave; the
-  // handful who want more can read the pages the agent points them at. Raise
-  // this back to 8 once the global cap is no longer the binding constraint.
-  perDayPerIp: 3,
+  // Back to 8 after a fortnight of evidence. The cap was dropped to 3 expecting
+  // a crowd from a LinkedIn post; the crowd was two people a week, and both of
+  // the genuinely interested ones hit the wall - one asked three questions in a
+  // single minute and was cut off. Meanwhile the global budget of 40 has never
+  // been close to spent. The tight cap was costing depth with the few visitors
+  // who matter while protecting nothing.
+  perDayPerIp: 8,
   perMinuteGlobal: 10, // under the 20/min ceiling
   message: 1000, // characters
   historyTurns: 6, // how much conversation to send back
