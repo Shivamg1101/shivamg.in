@@ -41,12 +41,16 @@ const LIMITS = {
 // present in OpenRouter's catalogue and above that floor at the time of writing.
 // Check https://openrouter.ai/api/v1/models before changing this list — a slug
 // that no longer exists fails exactly as silently as one that is rate-limited.
+// Instruction-tuned models first, deliberately. A reasoning model was tried at
+// the head of this list and answered a recruiter with "Here's a thinking
+// process: 1. Analyze User Input" — its scratchpad, verbatim. Availability is
+// not the only thing that matters here; the reply is read by a stranger with no
+// idea what a chain of thought is.
 const MODELS = [
-  "thinkingmachines/inkling:free",
-  "nvidia/nemotron-3.5-lightning:free",
-  "nex-agi/nex-n2.5-pro:free",
   "google/gemma-4-31b-it:free",
+  "nvidia/nemotron-3.5-lightning:free",
   "inclusionai/ling-3.0-flash-vl:free",
+  "nex-agi/nex-n2.5-pro:free",
 ];
 
 const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL!;
@@ -60,6 +64,33 @@ const OUT_OF_BUDGET =
   "and you can reach Shivam directly at /contact.";
 
 type Turn = { role: "user" | "assistant"; content: string };
+
+/**
+ * Removes a model's visible reasoning from the reply.
+ *
+ * Free models come and go, so the list above will change again, and the next
+ * replacement may well be a reasoning model. Ordering the list is the first
+ * defence; this is the second, because the failure is silent and lands in front
+ * of a recruiter — one model answered "Here's a thinking process: 1. Analyze
+ * User Input" and nothing else.
+ *
+ * Narrow on purpose: <think> blocks are a real convention, and a leading
+ * scratchpad paragraph is recognisable. Anything cleverer risks eating a real
+ * answer, which would be worse than the problem.
+ */
+function stripReasoning(text: string): string {
+  let out = text.replace(/<think(ing)?>[\s\S]*?<\/think(ing)?>/gi, "").trim();
+
+  // A scratchpad that opens the reply: drop everything up to the blank line
+  // that ends it, but only when something substantial remains afterwards.
+  const preamble = /^(here'?s? (my |a )?(thinking|thought)( process)?|let me think|reasoning)\b[\s\S]*?\n\s*\n/i;
+  if (preamble.test(out)) {
+    const trimmed = out.replace(preamble, "").trim();
+    if (trimmed.length > 80) out = trimmed;
+  }
+
+  return out.trim();
+}
 
 export async function POST(request: Request) {
   if (!SERVICE_KEY || !OPENROUTER_KEY) {
@@ -151,9 +182,16 @@ export async function POST(request: Request) {
       const data = await res.json();
       const text = data?.choices?.[0]?.message?.content;
       if (typeof text === "string" && text.trim()) {
-        answer = text.trim();
-        usedModel = model;
-        break;
+        const cleaned = stripReasoning(text);
+        // A model that returns nothing but reasoning has not answered. Better to
+        // try the next one than to show a visitor an empty bubble.
+        if (cleaned) {
+          answer = cleaned;
+          usedModel = model;
+          break;
+        }
+        lastError = `${model}: reasoning only, no answer`;
+        continue;
       }
       lastError = `${model}: empty response`;
     } catch (e) {
