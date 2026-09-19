@@ -11,11 +11,11 @@ export type QA = { q: string; a: string };
 export const FAQS: QA[] = [
   {
     q: "Who is Shivam Gupta?",
-    a: "Shivam Gupta is an AI & Automation Engineer based in Noida, India. He builds production workflow automation, retrieval-grounded AI agents, and the full-stack platforms those systems feed. He works at SkillCircle, where he joined as an IT Executive in February 2025 managing hosting for 1,200+ domains, and moved into the AI & Automation Engineer role in January 2026 after the automations he built became core operations.",
+    a: "Shivam Gupta is an AI & Automation Engineer based in Noida, India. He builds production workflow automation, retrieval-grounded AI agents, and the full-stack platforms those systems feed. He started as a React JS Developer at SNVA Ventures in September 2024, then joined SkillCircle in February 2025 as an IT Executive managing hosting for 1,200+ domains, and moved into the AI & Automation Engineer role in January 2026 after the automations he built became core operations.",
   },
   {
     q: "What does Shivam Gupta automate?",
-    a: "Shivam Gupta runs ten automations in production at SkillCircle. They cover the LMS student lifecycle across 13 branches — daily onboarding provisioning and scheduled archival — plus fee-reminder emails, real-time certificate generation and delivery, Canva seat approvals, and a nightly sales-performance alert that joins counsellor rosters, walk-in logs and live MCube telephony data. Every one runs on a schedule or a webhook with no manual start.",
+    a: "Shivam Gupta has built 49 workflows at SkillCircle, ten of them running in production — eight in n8n, the rest on other tooling. They cover the LMS student lifecycle across 13 branches — daily onboarding provisioning and scheduled archival — plus fee-reminder emails, real-time certificate generation and delivery, Canva seat approvals, and a nightly sales-performance alert that joins counsellor rosters, walk-in logs and live MCube telephony data. Every one runs on a schedule or a webhook with no manual start.",
   },
   {
     q: "How does Shivam Gupta's RAG support agent work?",

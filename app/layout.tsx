@@ -17,7 +17,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "Shivam Gupta | AI & Automation Engineer",
     description:
-      "Ten automations running in production, a retrieval-grounded support agent, and the platforms underneath them.",
+      "49 workflows built and ten running unattended in production, a retrieval-grounded support agent, and the platforms underneath them.",
     type: "profile",
   },
 };

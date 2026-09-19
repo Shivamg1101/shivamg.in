@@ -59,7 +59,7 @@ const CELLS: Cell[] = [
     area: "md:[grid-area:1/7/2/13] xl:[grid-area:2/1/3/5]",
     icon: <Globe />,
     title: "Operations at Scale",
-    body: "1,200+ domains, 13 branches and ten workflows running unattended against real student records.",
+    body: "1,200+ domains, 13 branches and ten of 49 workflows running unattended against real student records.",
     href: "/experience",
     ctaTitle: "View Experience",
     ctaBody: "The infrastructure underneath the automations",

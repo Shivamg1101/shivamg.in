@@ -84,8 +84,8 @@ export default async function OpengraphImage() {
         </div>
 
         <div style={{ fontSize: 27, color: "#a3a3a3", marginTop: 26, maxWidth: 900 }}>
-          Ten automations running in production, retrieval-grounded agents, and the
-          platforms underneath them.
+          49 workflows built, ten running in production, retrieval-grounded agents,
+          and the platforms underneath them.
         </div>
 
         <div style={{ display: "flex", gap: 12, marginTop: 40 }}>

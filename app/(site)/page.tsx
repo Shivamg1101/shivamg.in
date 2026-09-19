@@ -12,7 +12,7 @@ export const revalidate = 60;
 export const metadata: Metadata = pageMeta({
   title: "Shivam Gupta | AI & Automation Engineer",
   description:
-    "Ten automations running in production, a retrieval-grounded support agent, and the full-stack platforms underneath them.",
+    "49 workflows built and ten running unattended in production, a retrieval-grounded support agent, and the full-stack platforms underneath them.",
   path: "/",
 });
 

@@ -40,7 +40,7 @@ const TABS: Tab[] = [
 const PILLARS = [
   {
     title: "Automation against live systems",
-    body: "Ten workflows running on daily, scheduled and real-time triggers across Edmingle, Google Workspace, MCube telephony and WHMCS — no sandbox, no manual kick-off.",
+    body: "Ten of 49 workflows running on daily, scheduled and real-time triggers across Edmingle, Google Workspace, MCube telephony and WHMCS — no sandbox, no manual kick-off.",
   },
   {
     title: "Agents that refuse to guess",
@@ -80,7 +80,7 @@ const GROUPS: SkillGroup[] = [
   {
     key: "AI & Automation",
     skills: [
-      { name: "n8n", level: 92, projects: 10, note: "Ten production workflows on scheduled, webhook and real-time triggers." },
+      { name: "n8n", level: 92, projects: 49, note: "49 workflows built, eight live on scheduled, webhook and real-time triggers." },
       { name: "RAG pipelines", level: 78, projects: 1, note: "Qdrant vector store, Gemini embeddings, 800/80 chunking, top-8 retrieval." },
       { name: "LLM agents", level: 76, projects: 3, note: "Structured output with explicit human-escalation branches." },
       { name: "OpenAI / Gemini", level: 74, projects: 4, note: "Ad-creative generation and grounded support responses." },
@@ -128,7 +128,7 @@ const EXPERTISE = [
     title: "Workflow Automation",
     tech: ["n8n", "Cron", "Webhooks", "Google Workspace"],
     wins: [
-      "Ten workflows live on daily, scheduled and real-time triggers",
+      "49 workflows built, ten live on daily, scheduled and real-time triggers",
       "Full LMS student lifecycle automated across 13 branches",
       "Zero manual kick-off — every run is scheduled or event-driven",
     ],
