@@ -46,6 +46,11 @@ next-env.d.ts
 # personal reference material — not for a public repo
 Profile.pdf
 design/*.png
+# Generated résumés land here and carry a phone number and personal email. The
+# one the site serves is public/Shivam-Gupta-Resume.pdf and stays tracked; these
+# root copies are build output of the résumé template and must not be published.
+/Shivam_Gupta_*.pdf
+/*_Resume.pdf
 
 # local screenshot scratch
 .shots/
