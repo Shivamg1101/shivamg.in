@@ -163,13 +163,19 @@ export default async function BlogPostPage({
             <Reveal delay={0.05}>
               {/* Explicit dimensions so the image reserves its space before it
                   loads. Without them the text below jumps when it arrives,
-                  which counts against Cumulative Layout Shift. */}
+                  which counts against Cumulative Layout Shift.
+
+                  The column is max-w-2xl less px-6, so this never renders wider
+                  than 624px. Without `sizes` the browser assumes 100vw and asks
+                  the optimiser for w=3840 — six times what it can display, and a
+                  billed transformation for a variant no one sees. */}
               <Image
                 src={post.cover_url}
                 alt=""
                 width={1200}
                 height={630}
                 priority
+                sizes="(min-width: 672px) 624px, 100vw"
                 className="mt-8 aspect-[1200/630] w-full rounded-2xl border border-border object-cover"
               />
               {/* Pexels' terms require a credit to the photographer and a

@@ -66,11 +66,17 @@ export default async function BlogIndexPage() {
                   <Reveal delay={Math.min(i, 6) * 0.05}>
                     <article className="group relative overflow-hidden rounded-2xl border border-border/60 bg-card/60 transition-colors hover:border-primary/40">
                       {p.cover_url && (
+                        /* One column inside max-w-3xl less px-6, so 720px is the
+                           ceiling. Without `sizes` the browser assumes 100vw and
+                           every cover asks the optimiser for w=3840 to be drawn at
+                           347px — a billed transformation per image for pixels no
+                           one can see. */
                         <Image
                           src={p.cover_url}
                           alt=""
                           width={1200}
                           height={630}
+                          sizes="(min-width: 768px) 720px, 100vw"
                           className="aspect-[1200/630] w-full border-b border-border/60 object-cover"
                         />
                       )}
