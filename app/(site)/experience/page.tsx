@@ -58,8 +58,12 @@ export default async function ExperiencePage() {
       </section>
 
       {/* ---------------- timeline ---------------- */}
-      <section className="pb-8">
+      <section className="pb-8" aria-labelledby="timeline-heading">
         <div className="mx-auto max-w-6xl px-6">
+          {/* Roles render as h3; without this the outline jumps h1 to h3. */}
+          <h2 id="timeline-heading" className="sr-only">
+            Roles
+          </h2>
           <Timeline items={experience} />
         </div>
       </section>

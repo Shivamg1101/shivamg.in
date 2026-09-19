@@ -44,8 +44,12 @@ export default async function ProjectsPage() {
       </section>
 
       {/* ---------------- grid ---------------- */}
-      <section id="projects" className="scroll-mt-20 pb-16">
+      <section id="projects" className="scroll-mt-20 pb-16" aria-labelledby="projects-heading">
         <div className="mx-auto max-w-6xl px-6">
+          {/* Cards render as h3; without this the outline jumps h1 to h3. */}
+          <h2 id="projects-heading" className="sr-only">
+            Projects
+          </h2>
           <div className="grid gap-7 md:grid-cols-2 xl:grid-cols-3">
             {projects.map((p, i) => (
               <ProjectCard key={p.id} project={p} index={i} />

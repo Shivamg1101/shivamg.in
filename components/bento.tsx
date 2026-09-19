@@ -173,11 +173,19 @@ function Card({ cell, index }: { cell: Cell; index: number }) {
 
 export function Bento() {
   return (
-    <section id="highlights" className="relative overflow-hidden bg-background py-16 dark:bg-black">
+    <section
+      id="highlights"
+      aria-labelledby="highlights-heading"
+      className="relative overflow-hidden bg-background py-16 dark:bg-black"
+    >
       <div aria-hidden className="absolute -left-40 -top-40 h-80 w-80 rounded-full bg-primary/5 opacity-50 blur-3xl" />
       <div aria-hidden className="absolute -bottom-40 -right-40 h-80 w-80 rounded-full bg-blue-500/5 opacity-50 blur-3xl" />
 
       <div className="container mx-auto px-4 md:px-6">
+        {/* The cards are h3; without an h2 above them the outline skips a level. */}
+        <h2 id="highlights-heading" className="sr-only">
+          Highlights
+        </h2>
         <ul className="grid grid-cols-1 grid-rows-none gap-4 md:grid-cols-12 md:grid-rows-3 lg:gap-4 xl:max-h-[34rem] xl:grid-rows-2">
           {CELLS.map((c, i) => (
             <Card key={c.title} cell={c} index={i} />
