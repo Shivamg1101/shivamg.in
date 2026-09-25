@@ -2,17 +2,17 @@
 
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
-import { motion, useReducedMotion } from "framer-motion";
+import { motion } from "framer-motion";
+import { useReducedMotion } from "@/lib/use-reduced-motion";
 import type { Profile } from "@/lib/types";
 
-/** The same introduction, cycled through a few languages. */
-const GREETINGS = [
-  "Hi, I'm Shivam",
-  "नमस्ते, मैं शिवम हूँ",
-  "Hola, soy Shivam",
-  "Bonjour, je suis Shivam",
-  "こんにちは、シヴァムです",
-];
+/**
+ * The same introduction, cycled through a few languages. Only the greeting
+ * cycles; the full name is rendered as static text beneath it, so the visible
+ * heading always carries "Shivam Gupta" and the server and client agree on it.
+ * The first entry is what ships in the HTML and what crawlers read.
+ */
+const GREETINGS = ["Hi, I'm", "नमस्ते, मैं", "Hola, soy", "Bonjour, je suis", "こんにちは、私は"];
 
 /* ------------------------------------------------------------------ *
  * Typewriter: types a greeting, holds, deletes, moves to the next.
@@ -57,29 +57,38 @@ function rand(i: number, salt: number) {
   return x - Math.floor(x);
 }
 
-function Particles({ count = 50 }: { count?: number }) {
-  const seeds = useMemo(
-    () =>
-      Array.from({ length: count }, (_, i) => ({
-        size: 1 + rand(i, 1) * 3,
-        x: rand(i, 2) * 100,
-        y: rand(i, 3) * 100,
-        dur: 12 + rand(i, 4) * 14,
-        delay: rand(i, 5) * 10,
-      })),
-    [count]
-  );
+/** Fixed precision, so the inline style the server writes is byte-for-byte
+ *  what the client computes — long floats were re-serialised by the browser
+ *  and flagged as an attribute mismatch during hydration. */
+const fix = (n: number) => n.toFixed(2);
 
+// Computed once at module scope: pure data, identical on server and client.
+const PARTICLES = Array.from({ length: 50 }, (_, i) => {
+  const size = `${fix(1 + rand(i, 1) * 3)}px`;
+  return {
+    width: size,
+    height: size,
+    left: `${fix(rand(i, 2) * 100)}%`,
+    top: `${fix(rand(i, 3) * 100)}%`,
+    animationDuration: `${fix(12 + rand(i, 4) * 14)}s`,
+    animationDelay: `${fix(rand(i, 5) * 10)}s`,
+  };
+});
+
+/**
+ * Plain CSS keyframes (`.animate-particle` in globals.css) rather than fifty
+ * framer-motion components: same drift, rise and fade, but it runs on the
+ * compositor instead of costing fifty JS animation loops and fifty extra
+ * components to hydrate on the main thread — a measurable part of mobile TBT.
+ * Reduced-motion users get no particles via the global media query, and there
+ * is no JS branch on the preference, so nothing differs between server and
+ * client markup.
+ */
+function Particles() {
   return (
     <div aria-hidden className="absolute inset-0 overflow-hidden">
-      {seeds.map((s, i) => (
-        <motion.span
-          key={i}
-          className="absolute rounded-full bg-primary/30"
-          style={{ width: s.size, height: s.size, left: `${s.x}%`, top: `${s.y}%` }}
-          animate={{ y: [0, -40, 0], opacity: [0, 0.9, 0], scale: [0.8, 1.4, 0.8] }}
-          transition={{ duration: s.dur, delay: s.delay, repeat: Infinity, ease: "easeInOut" }}
-        />
+      {PARTICLES.map((style, i) => (
+        <span key={i} className="animate-particle absolute rounded-full bg-primary/30" style={style} />
       ))}
     </div>
   );
@@ -226,7 +235,7 @@ export function Hero({ profile }: { profile: Profile }) {
   return (
     <section id="hero" aria-label="Hero" className="w-full overflow-hidden">
       <div className="relative flex min-h-dvh flex-col items-center justify-center overflow-hidden bg-background dark:bg-black">
-        {!still && <Particles />}
+        <Particles />
 
         {/* ambient glows */}
         <div aria-hidden className="absolute right-20 top-20 h-96 w-96 rounded-full bg-gradient-to-br from-primary/10 to-blue-500/10 blur-3xl" />
@@ -235,21 +244,25 @@ export function Hero({ profile }: { profile: Profile }) {
         <Geometry still={still} />
 
         <div className="relative z-10 mx-auto flex w-full max-w-7xl flex-1 flex-col items-center justify-center px-4 text-center sm:px-6 lg:px-8">
-          {/* typewriter greeting */}
+          {/* Greeting types through a few languages above the name, which is
+              static text: the visible heading always reads "Hi, I'm Shivam
+              Gupta" in the server HTML, and the name never disappears while
+              the greeting animates. */}
           <motion.h1
             {...rise}
-            className="mb-6 flex min-h-[1.2em] w-full items-center justify-center text-4xl font-bold sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl"
+            className="mb-6 flex w-full flex-col items-center justify-center font-bold"
           >
-            {/* plain inline, not inline-flex, so long greetings wrap on narrow
-                screens instead of running past the viewport */}
-            <div className="text-balance bg-gradient-to-r from-foreground via-primary to-blue-500 bg-clip-text leading-tight text-transparent">
+            <span className="flex min-h-[1.25em] items-center justify-center text-2xl leading-tight text-muted-foreground sm:text-3xl md:text-4xl lg:text-5xl">
               <span>{greeting}</span>
-              <span className="ml-1 inline-block h-[0.8em] w-0.5 translate-y-[0.06em] animate-pulse bg-primary align-middle" />
-            </div>
-            {/* The visible heading cycles languages, so give crawlers and
-                screen readers one stable, descriptive phrase. */}
-            <span className="sr-only">
-              {profile.name} — {profile.headline}
+              <span
+                aria-hidden
+                className="ml-1 inline-block h-[0.8em] w-0.5 translate-y-[0.06em] animate-pulse bg-primary align-middle"
+              />
+            </span>{" "}
+            {/* plain block text, so the name wraps on narrow screens instead
+                of running past the viewport */}
+            <span className="text-balance bg-gradient-to-r from-foreground via-primary to-blue-500 bg-clip-text pb-1 text-4xl leading-tight text-transparent sm:text-6xl md:text-7xl lg:text-8xl">
+              {profile.name}
             </span>
           </motion.h1>
 
