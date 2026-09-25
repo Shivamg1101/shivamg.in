@@ -1,4 +1,4 @@
-import { SITE_NAME, SITE_URL } from "@/lib/site";
+import { PERSON_IMAGE, SITE_NAME, SITE_URL } from "@/lib/site";
 import type { Experience, Profile, Project } from "@/lib/types";
 import type { QA } from "@/components/faq";
 
@@ -24,7 +24,14 @@ export function PersonSchema({
   experience: Experience[];
 }) {
   const current = experience.find((e) => e.is_current);
+  // Every profile URL the CMS holds. Only real, stored URLs go in — never
+  // guessed handles — since sameAs is a claim that the account is this person.
   const sameAs = [profile.github_url, profile.linkedin_url].filter(Boolean);
+
+  // Split from the CMS name rather than hard-coded, so the graph follows edits.
+  const parts = profile.name.trim().split(/\s+/);
+  const givenName = parts[0] || undefined;
+  const familyName = parts.length > 1 ? parts[parts.length - 1] : undefined;
 
   // profile.location is a single free-text field ("Noida, India"). Putting the
   // whole string in addressLocality gives a city called "Noida, India", which
@@ -39,7 +46,18 @@ export function PersonSchema({
         "@type": "Person",
         "@id": `${SITE_URL}/#person`,
         name: profile.name,
+        givenName,
+        familyName,
         url: SITE_URL,
+        // The headshot the header already serves from /public, as an absolute
+        // URL so it resolves wherever the graph is read.
+        image: {
+          "@type": "ImageObject",
+          url: `${SITE_URL}${PERSON_IMAGE.path}`,
+          width: PERSON_IMAGE.width,
+          height: PERSON_IMAGE.height,
+          caption: profile.name,
+        },
         jobTitle: profile.headline,
         description: profile.tagline ?? undefined,
         email: profile.email ? `mailto:${profile.email}` : undefined,

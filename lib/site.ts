@@ -4,6 +4,9 @@ export const SITE_URL =
 
 export const SITE_NAME = "Shivam Gupta";
 
+/** The headshot in /public (also the header avatar), used for Person JSON-LD. */
+export const PERSON_IMAGE = { path: "/shivam.png", width: 160, height: 160 } as const;
+
 /**
  * Build page metadata consistently.
  *
