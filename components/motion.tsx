@@ -1,6 +1,7 @@
 "use client";
 
-import { motion, useScroll, useSpring, useTransform, useReducedMotion } from "framer-motion";
+import { motion, useScroll, useSpring, useTransform } from "framer-motion";
+import { useReducedMotion } from "@/lib/use-reduced-motion";
 import { useRef, type ReactNode } from "react";
 
 /** The reference's FadeIn easing and duration, used everywhere. */
