@@ -50,13 +50,18 @@ const LIMITS = {
 // suggest. nvidia/nemotron-3.5-lightning:free was removed outright: despite
 // "lightning" it is a reasoning model and returned its scratchpad twice, and the
 // stripper below only caught the header, leaving the numbered steps in place.
-// ling-3.0-flash-vl answered cleanly and leads for that reason; gemma is an
-// instruct model and stays as a fallback, though it was failing when this was
-// written.
+// On 2026-09-29 it had been down again since the 25th: ling-3.0-flash-vl and
+// nex-n2.5-pro were both withdrawn (404), and gemma's only provider showed no
+// uptime at all. The replacements were chosen by OpenRouter's per-endpoint
+// uptime (https://openrouter.ai/api/v1/models/{slug}/endpoints), which is a
+// better signal than the catalogue - gemma was listed while serving nothing.
+// The first three reason by default, qwen at its highest effort, which is why
+// the request turns reasoning off rather than trusting stripReasoning alone.
 const MODELS = [
-  "inclusionai/ling-3.0-flash-vl:free",
+  "thinkingmachines/inkling-small:free",
+  "qwen/qwen3.8-27b:free",
+  "nvidia/nemotron-3-super-120b-a12b:free",
   "google/gemma-4-31b-it:free",
-  "nex-agi/nex-n2.5-pro:free",
 ];
 
 const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL!;
@@ -184,6 +189,11 @@ export async function POST(request: Request) {
           model,
           max_tokens: 500,
           temperature: 0.3,
+          // Off, not merely hidden. `exclude` alone still spends the reasoning
+          // against max_tokens, and at these models' default efforts that can
+          // use all 500 before a word of answer - an empty reply every time.
+          // None of the four marks reasoning mandatory, so this is accepted.
+          reasoning: { enabled: false, exclude: true },
           messages: [{ role: "system", content: system }, ...history, { role: "user", content: message }],
         }),
         signal: AbortSignal.timeout(30_000),
