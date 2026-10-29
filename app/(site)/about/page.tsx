@@ -208,13 +208,16 @@ export default async function AboutPage() {
 
         <div className="relative mx-auto max-w-6xl px-6">
           <Reveal immediate className="text-center">
+            {/* The name is the query this page should answer, so it leads the
+                heading; the role follows as the subtitle. */}
             <h1 className="text-4xl font-extrabold sm:text-5xl lg:text-6xl">
-              AI &amp; Automation{" "}
+              About{" "}
               <span className="bg-gradient-to-r from-primary to-blue-500 bg-clip-text text-transparent">
-                Engineer
+                {profile.name}
               </span>
             </h1>
-            <p className="mx-auto mt-4 max-w-2xl text-muted-foreground">
+            <p className="mt-4 text-xl font-bold sm:text-2xl">{profile.headline}</p>
+            <p className="mx-auto mt-3 max-w-2xl text-muted-foreground">
               Building production automation, retrieval-grounded agents, and the internal platforms
               they feed.
             </p>

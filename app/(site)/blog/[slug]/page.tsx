@@ -171,7 +171,7 @@ export default async function BlogPostPage({
                   billed transformation for a variant no one sees. */}
               <Image
                 src={post.cover_url}
-                alt=""
+                alt={post.title}
                 width={1200}
                 height={630}
                 priority

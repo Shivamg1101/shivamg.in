@@ -144,6 +144,19 @@
 .animate-ping-slow { animation: ping-slow 1.8s cubic-bezier(0, 0, 0.2, 1) infinite; }
 .animate-drift { animation: drift 9s ease-in-out infinite; }
 
+/* Hero particle field. Duration and delay come from inline styles; `both`
+   keeps each particle transparent during its delay, as it was before. */
+@keyframes particle {
+  0%, 100% { transform: translateY(0) scale(0.8); opacity: 0; }
+  50%      { transform: translateY(-40px) scale(1.4); opacity: 0.9; }
+}
+.animate-particle {
+  animation-name: particle;
+  animation-timing-function: ease-in-out;
+  animation-iteration-count: infinite;
+  animation-fill-mode: both;
+}
+
 /* The reference's card interaction, as one reusable class */
 .card-hover {
   transition:

@@ -4,7 +4,8 @@ import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState, useSyncExternalStore } from "react";
-import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
+import { useReducedMotion } from "@/lib/use-reduced-motion";
 
 const NAV = [
   { label: "Home", href: "/" },
@@ -61,7 +62,13 @@ function ThemeToggle() {
 }
 
 export function Header({ name }: { name: string }) {
-  const pathname = usePathname();
+  // On Vercel, ISR re-renders of the home page report their pathname as
+  // "/index" (the RSC payload carries ["", "index"]), while the browser says
+  // "/". The server then marked no link active and the client marked Home
+  // active, which added an element during hydration and threw React #418.
+  // Normalising keeps both renders identical.
+  const rawPathname = usePathname();
+  const pathname = rawPathname === "/index" || !rawPathname ? "/" : rawPathname;
   const reduce = useReducedMotion();
   const [open, setOpen] = useState(false);
 

@@ -1,6 +1,7 @@
 "use client";
 
-import { motion, useReducedMotion } from "framer-motion";
+import { motion } from "framer-motion";
+import { useReducedMotion } from "@/lib/use-reduced-motion";
 import type { Project } from "@/lib/types";
 
 /** Cover treatments, cycled by index so every card differs. */

@@ -73,7 +73,7 @@ export default async function BlogIndexPage() {
                            one can see. */
                         <Image
                           src={p.cover_url}
-                          alt=""
+                          alt={p.title}
                           width={1200}
                           height={630}
                           sizes="(min-width: 768px) 720px, 100vw"
