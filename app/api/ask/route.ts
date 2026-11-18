@@ -57,11 +57,18 @@ const LIMITS = {
 // better signal than the catalogue - gemma was listed while serving nothing.
 // The first three reason by default, qwen at its highest effort, which is why
 // the request turns reasoning off rather than trusting stripReasoning alone.
+// On 2026-11-18 it was down again: inkling-small, qwen3.8-27b and
+// nemotron-3-super had all been withdrawn, leaving gemma as the only live entry,
+// and gemma was answering 429. One live model is no fallback at all, so the list
+// now spans four different providers: a busy provider costs one slot, not the
+// agent. Only one Google model on purpose - both gemmas share Google AI Studio's
+// free capacity and would be rate-limited together. All four showed 100% uptime
+// over the previous day; none had yet been seen answering a real question here.
 const MODELS = [
-  "thinkingmachines/inkling-small:free",
-  "qwen/qwen3.8-27b:free",
-  "nvidia/nemotron-3-super-120b-a12b:free",
+  "thinkingmachines/inkling-2-small:free",
+  "inclusionai/ling-3.2-flash:free",
   "google/gemma-4-31b-it:free",
+  "baidu/ernie-5.5-flash-preview:free",
 ];
 
 const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL!;
@@ -101,6 +108,30 @@ function stripReasoning(text: string): string {
   }
 
   return out.trim();
+}
+
+/**
+ * OpenRouter's own error message for a failed call, shortened for the log.
+ *
+ * The status code alone hides the one fact that decides the fix. A 429 can mean
+ * the account's free daily allowance is spent (every free model will fail until
+ * it resets, so swapping models is pointless) or that one model's provider is
+ * busy (the next model may well answer). The message says which.
+ */
+async function errorDetail(res: Response): Promise<string> {
+  try {
+    const body = await res.text();
+    let msg: unknown = body;
+    try {
+      msg = JSON.parse(body)?.error?.message ?? body;
+    } catch {
+      // not JSON; keep the raw text
+    }
+    const short = String(msg).replace(/\s+/g, " ").trim().slice(0, 140);
+    return short ? ` (${short})` : "";
+  } catch {
+    return "";
+  }
 }
 
 export async function POST(request: Request) {
@@ -171,7 +202,9 @@ export async function POST(request: Request) {
 
   let answer: string | null = null;
   let usedModel = "";
-  let lastError = "";
+  // Every model's failure, not just the last: with four fallbacks, the last
+  // error alone hid that the first three had been withdrawn outright.
+  const failures: string[] = [];
   const startedAt = Date.now();
 
   for (const model of MODELS) {
@@ -192,7 +225,9 @@ export async function POST(request: Request) {
           // Off, not merely hidden. `exclude` alone still spends the reasoning
           // against max_tokens, and at these models' default efforts that can
           // use all 500 before a word of answer - an empty reply every time.
-          // None of the four marks reasoning mandatory, so this is accepted.
+          // A model that makes reasoning mandatory rejects this with a 400,
+          // which is logged below and skipped past - check that log whenever
+          // the list changes.
           reasoning: { enabled: false, exclude: true },
           messages: [{ role: "system", content: system }, ...history, { role: "user", content: message }],
         }),
@@ -200,7 +235,7 @@ export async function POST(request: Request) {
       });
 
       if (!res.ok) {
-        lastError = `${model}: HTTP ${res.status}`;
+        failures.push(`${model}: HTTP ${res.status}${await errorDetail(res)}`);
         continue; // model retired, rate limited, or briefly down — try the next
       }
 
@@ -215,28 +250,29 @@ export async function POST(request: Request) {
           usedModel = model;
           break;
         }
-        lastError = `${model}: reasoning only, no answer`;
+        failures.push(`${model}: reasoning only, no answer`);
         continue;
       }
-      lastError = `${model}: empty response`;
+      failures.push(`${model}: empty response`);
     } catch (e) {
-      lastError = `${model}: ${e instanceof Error ? e.message : "failed"}`;
+      failures.push(`${model}: ${e instanceof Error ? e.message : "failed"}`);
     }
   }
 
   if (!answer) {
-    console.error("[ask] all models failed:", lastError);
+    const summary = failures.join(" | ");
+    console.error("[ask] all models failed:", summary);
 
     // Record the failure. Until now only successful answers were written, so a
     // completely broken agent produced an empty table — indistinguishable from
     // nobody visiting. That is how this went unnoticed for over a week. The row
-    // carries no answer and names the last error, so `select * from chat_usage
-    // where answer is null` is the health check.
+    // carries no answer and names every model's error, so `select * from
+    // chat_usage where answer is null` is the health check.
     await supabase.from("chat_usage").insert({
       ip_hash: ipHash,
       question: redact(message),
       answer: null,
-      model: `FAILED: ${lastError}`.slice(0, 300),
+      model: `FAILED: ${summary}`.slice(0, 1000),
       ms: Date.now() - startedAt,
     });
 
