@@ -13,9 +13,26 @@ function emptyRow(c: Collection): Row {
   const r: Row = {};
   for (const f of c.fields) {
     r[f.key] =
-      f.type === "list" ? [] : f.type === "bool" ? false : f.type === "number" ? 0 : "";
+      f.type === "list"
+        ? []
+        : f.type === "bool"
+          ? false
+          : f.type === "number"
+            ? 0
+            : f.type === "date"
+              ? null // Postgres rejects "" for date columns
+              : f.type === "select"
+                ? (f.options?.[0] ?? "") // match what the dropdown displays
+                : "";
   }
   return r;
+}
+
+function isBlank(v: unknown): boolean {
+  if (v == null) return true;
+  if (typeof v === "string") return v.trim() === "";
+  if (Array.isArray(v)) return v.length === 0;
+  return false;
 }
 
 function FieldInput({
@@ -150,12 +167,25 @@ export function CollectionEditor({ collection }: { collection: Collection }) {
 
   async function save() {
     if (!editing) return;
-    setBusy(true);
     setErr(null);
     setNote(null);
 
+    const missing = collection.fields.filter((f) => f.required && isBlank(editing[f.key]));
+    if (missing.length) {
+      setErr(`Please fill in: ${missing.map((f) => f.label).join(", ")}`);
+      return;
+    }
+
+    setBusy(true);
     const payload: Row = {};
-    for (const f of collection.fields) payload[f.key] = editing[f.key];
+    for (const f of collection.fields) {
+      let v = editing[f.key];
+      // A blank date must be sent as null, never "" (invalid input syntax for type date).
+      if (f.type === "date" && v === "") v = null;
+      // An unset select displays its first option, so save that option.
+      if (f.type === "select" && isBlank(v)) v = f.options?.[0] ?? null;
+      payload[f.key] = v;
+    }
 
     const supabase = createClient();
     const id = editing.id;
