@@ -58,23 +58,31 @@ const LIMITS = {
 // The first three reason by default, qwen at its highest effort, which is why
 // the request turns reasoning off rather than trusting stripReasoning alone.
 // On 2026-11-18 it was down again: inkling-small, qwen3.8-27b and
-// nemotron-3-super had all been withdrawn, leaving gemma as the only live entry,
-// and gemma was answering 429. One live model is no fallback at all, so the list
-// now spans four different providers: a busy provider costs one slot, not the
-// agent. Only one Google model on purpose - both gemmas share Google AI Studio's
-// free capacity and would be rate-limited together. All four showed 100% uptime
-// over the previous day; none had yet been seen answering a real question here.
-const MODELS = [
-  "thinkingmachines/inkling-2-small:free",
-  "inclusionai/ling-3.2-flash:free",
-  "google/gemma-4-31b-it:free",
-  "baidu/ernie-5.5-flash-preview:free",
+// nemotron-3-super had all been withdrawn and gemma was answering 429. Their
+// four replacements lasted two days. The failure log on 2026-11-20 read:
+// inkling-2-small:free 404 (free version withdrawn), ling-3.2-flash:free and
+// gemma-4-31b-it:free 429 "Provider returned error" (the provider's shared free
+// capacity was full), ernie-5.5-flash-preview:free 400 (reasoning mandatory).
+//
+// The lesson: OpenRouter's free models are shared with every other OpenRouter
+// user, so they are busiest exactly when they are most useful. Google's own
+// Gemini API has a free tier whose limits belong to this project alone, so it
+// now goes first, and each Gemini model has its own quota, hence two. One
+// OpenRouter model stays as a last resort; trying it costs nothing. The trade:
+// on Google's free tier, prompts may be used to improve Google's products.
+type Provider = "gemini" | "openrouter";
+const ROUTES: { provider: Provider; model: string }[] = [
+  { provider: "gemini", model: "gemini-3.5-flash-lite" },
+  { provider: "gemini", model: "gemini-3.8-flash" },
+  { provider: "openrouter", model: "google/gemma-4-31b-it:free" },
 ];
 
 const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL!;
 const SERVICE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
+const GEMINI_KEY = process.env.GEMINI_API_KEY;
 const OPENROUTER_KEY = process.env.OPENROUTER_API_KEY;
 const SITE = process.env.NEXT_PUBLIC_SITE_URL ?? "https://shivamg.in";
+const keyFor = (p: Provider) => (p === "gemini" ? GEMINI_KEY : OPENROUTER_KEY);
 
 const OUT_OF_BUDGET =
   "I've answered as many questions as I can today — I run on a small free allowance. " +
@@ -123,7 +131,9 @@ async function errorDetail(res: Response): Promise<string> {
     const body = await res.text();
     let msg: unknown = body;
     try {
-      msg = JSON.parse(body)?.error?.message ?? body;
+      // Gemini's OpenAI-compatible endpoint sometimes wraps the error in an array.
+      const parsed = JSON.parse(body);
+      msg = (Array.isArray(parsed) ? parsed[0] : parsed)?.error?.message ?? body;
     } catch {
       // not JSON; keep the raw text
     }
@@ -134,8 +144,66 @@ async function errorDetail(res: Response): Promise<string> {
   }
 }
 
+type Message = { role: "system" | "user" | "assistant"; content: string };
+
+/** The HTTP call for one entry in ROUTES. Both providers speak the OpenAI chat format. */
+function buildRequest(provider: Provider, model: string, messages: Message[]): { url: string; init: RequestInit } {
+  const signal = AbortSignal.timeout(30_000);
+
+  if (provider === "gemini") {
+    return {
+      url: "https://generativelanguage.googleapis.com/v1beta/openai/chat/completions",
+      init: {
+        method: "POST",
+        headers: { Authorization: `Bearer ${GEMINI_KEY}`, "Content-Type": "application/json" },
+        body: JSON.stringify({
+          model,
+          // Gemini 3 models cannot switch thinking off, only turn it down, and
+          // the thinking counts against this cap: at 500 it could use the lot
+          // and return an empty reply. Answer length is set by the system
+          // prompt (about 120 words); this is only a guard rail. The thinking
+          // itself is not included in the reply unless asked for.
+          max_tokens: 2048,
+          temperature: 0.3,
+          reasoning_effort: "low",
+          messages,
+        }),
+        signal,
+      },
+    };
+  }
+
+  return {
+    url: "https://openrouter.ai/api/v1/chat/completions",
+    init: {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${OPENROUTER_KEY}`,
+        "Content-Type": "application/json",
+        // OpenRouter uses these for attribution on its dashboard.
+        "HTTP-Referer": SITE,
+        "X-Title": "shivamg.in",
+      },
+      body: JSON.stringify({
+        model,
+        max_tokens: 500,
+        temperature: 0.3,
+        // Off, not merely hidden. `exclude` alone still spends the reasoning
+        // against max_tokens, and at these models' default efforts that can
+        // use all 500 before a word of answer - an empty reply every time.
+        // A model that makes reasoning mandatory rejects this with a 400,
+        // which is logged and skipped past - check that log whenever the
+        // list changes.
+        reasoning: { enabled: false, exclude: true },
+        messages,
+      }),
+      signal,
+    },
+  };
+}
+
 export async function POST(request: Request) {
-  if (!SERVICE_KEY || !OPENROUTER_KEY) {
+  if (!SERVICE_KEY || !ROUTES.some((r) => keyFor(r.provider))) {
     return NextResponse.json({ error: "Chat is not configured." }, { status: 503 });
   }
 
@@ -207,32 +275,14 @@ export async function POST(request: Request) {
   const failures: string[] = [];
   const startedAt = Date.now();
 
-  for (const model of MODELS) {
+  const messages: Message[] = [{ role: "system", content: system }, ...history, { role: "user", content: message }];
+
+  for (const route of ROUTES) {
+    if (!keyFor(route.provider)) continue; // that provider's key isn't configured
+    const model = `${route.provider}/${route.model}`; // label for the log
     try {
-      const res = await fetch("https://openrouter.ai/api/v1/chat/completions", {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${OPENROUTER_KEY}`,
-          "Content-Type": "application/json",
-          // OpenRouter uses these for attribution on its dashboard.
-          "HTTP-Referer": SITE,
-          "X-Title": "shivamg.in",
-        },
-        body: JSON.stringify({
-          model,
-          max_tokens: 500,
-          temperature: 0.3,
-          // Off, not merely hidden. `exclude` alone still spends the reasoning
-          // against max_tokens, and at these models' default efforts that can
-          // use all 500 before a word of answer - an empty reply every time.
-          // A model that makes reasoning mandatory rejects this with a 400,
-          // which is logged below and skipped past - check that log whenever
-          // the list changes.
-          reasoning: { enabled: false, exclude: true },
-          messages: [{ role: "system", content: system }, ...history, { role: "user", content: message }],
-        }),
-        signal: AbortSignal.timeout(30_000),
-      });
+      const { url, init } = buildRequest(route.provider, route.model, messages);
+      const res = await fetch(url, init);
 
       if (!res.ok) {
         failures.push(`${model}: HTTP ${res.status}${await errorDetail(res)}`);
